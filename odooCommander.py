@@ -46,6 +46,7 @@ class oddoCommander :
                 self.database_name = input("Ingresa el nombre de la base de datos: ")
 
             if selected_option == "4":
+                print("Adios")
                 break
 
 
