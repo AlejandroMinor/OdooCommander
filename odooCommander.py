@@ -90,10 +90,10 @@ class oddoCommander :
                 option = input (f"Se reiniciara Odoo desea continuar ? (S/N) \n")
                 if option == "S" or option == "s":
                     restart_command = "sudo systemctl restart odoo"
+                    print("Reiniciando Odoo...")
                     os.system(restart_command)
                     # Mostrar la respuesta de la terminal en la consola
-                    print("Reiniciando Odoo...")
-
+                   
             if selected_option == "5":
                 print("Adios")
                 break
