@@ -8,6 +8,7 @@ class oddoCommander :
 
     def __init__ (self):
 
+        # Configurar el historial de comandos
         histfile = os.path.join(os.environ['HOME'], '.pythonhistory')
         try:
             readline.read_history_file(histfile)
@@ -53,7 +54,7 @@ class oddoCommander :
   \___/\__,_\___/\___/  \___\___/_|_|_|_|_|_\__,_|_||_\__,_\___|_|                                                               
 """)
             print(f"➡ Base actual {self.database_name}")
-            print("1.- Actualizar la base \n2.- Actualizar solo un modulo\n3.- Cambiar base\n4.- Reinciar Odoo \n5.- Salir")
+            print("1.- Actualizar la base \n2.- Actualizar solo un modulo\n3.- Cambiar base\n4.- Reinciar Odoo \n5.- Limpiar pantalla \n6.- Salir")
             
             selected_option = input("Acción a realizar: \n")
 
@@ -74,7 +75,7 @@ class oddoCommander :
                     command(self.database_name,self.module)
 
             if selected_option == "3":
-                print("Para ver el listado de bases en el sistema porfavor ingresesa la contraseña del usuario odoo")
+                print("Puedes usar tab para autocompletar el nombre de la base de datos")
                 # Ejecutar el comando psql para obtener el listado de bases de datos
                 #command_psql = "psql -h localhost -U odoo -d postgres -1 -c '\l'" 
                 command_psql = "psql -U odoo -l -t | cut -d'|' -f 1 | sed -e 's/ //g' -e '/^$/d'"
@@ -83,7 +84,6 @@ class oddoCommander :
                 output, error = process.communicate()
                 # Guardar cada linea en una lista y luego imprimirlo
                 lines = [""]
-                
                 for line in output.decode("utf-8").splitlines():
                     lines.append(f"{line}")
                     print(line)
@@ -122,6 +122,10 @@ class oddoCommander :
                     print("Reiniciando Odoo...")
 
             if selected_option == "5":
+                    clear_command = "clear"
+                    os.system(clear_command)
+
+            if selected_option == "6":
                 print("Adios")
                 break
 
