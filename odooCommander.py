@@ -1,12 +1,24 @@
 import os
 import subprocess
-
 from click import command
+import readline
 
 
 class oddoCommander :
 
     def __init__ (self):
+
+        # Configurar el historial de comandos
+        histfile = os.path.join(os.environ['HOME'], '.pythonhistory')
+        try:
+            readline.read_history_file(histfile)
+            readline.set_history_length(1000)
+        except FileNotFoundError:
+            pass
+        import atexit
+        atexit.register(readline.write_history_file, histfile)
+
+
         # Inicializar las variables self.database_name y self.module
         self.database_name = ''
         self.module = ''
@@ -35,7 +47,12 @@ class oddoCommander :
         # Ciclo para mostrar el menu
         while selected_option !=4 :
             
-            
+            print("""
+   ___     _             ___                              _         
+  / _ \ __| |___  ___   / __|___ _ __  _ __  __ _ _ _  __| |___ _ _ 
+ | (_) / _` / _ \/ _ \ | (__/ _ \ '  \| '  \/ _` | ' \/ _` / -_) '_|
+  \___/\__,_\___/\___/  \___\___/_|_|_|_|_|_\__,_|_||_\__,_\___|_|                                                               
+""")
             print(f"➡ Base actual {self.database_name}")
             print("1.- Actualizar la base \n2.- Actualizar solo un modulo\n3.- Cambiar base\n4.- Reinciar Odoo \n5.- Limpiar pantalla \n6.- Salir")
             
@@ -58,7 +75,7 @@ class oddoCommander :
                     command(self.database_name,self.module)
 
             if selected_option == "3":
-                print("Para ver el listado de bases en el sistema porfavor ingresesa la contraseña del usuario odoo")
+                print("Puedes usar tab para autocompletar el nombre de la base de datos")
                 # Ejecutar el comando psql para obtener el listado de bases de datos
                 #command_psql = "psql -h localhost -U odoo -d postgres -1 -c '\l'" 
                 command_psql = "psql -U odoo -l -t | cut -d'|' -f 1 | sed -e 's/ //g' -e '/^$/d'"
@@ -67,14 +84,24 @@ class oddoCommander :
                 output, error = process.communicate()
                 # Guardar cada linea en una lista y luego imprimirlo
                 lines = [""]
-
-                for line in output.decode("utf-8").splitlines():
-                    lines.append(f"Resultado,{line}")
-                    print(line)
-
                 for line in output.decode("utf-8").splitlines():
                     lines.append(f"{line}")
                     print(line)
+
+                # Definir la lista de elementos
+                elementos = lines
+
+                # Configurar la autocompletación con la lista de elementos
+                def completer(text, state):
+                    options = [x for x in elementos if x.startswith(text)]
+                    if state < len(options):
+                        return options[state]
+                    else:
+                        return None
+
+                readline.set_completer(completer)
+                readline.parse_and_bind("tab: complete")
+
                 # Inicializar la variable bandera
                 bandera = False
                 while bandera == False:
