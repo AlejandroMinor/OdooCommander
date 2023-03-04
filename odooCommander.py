@@ -118,8 +118,6 @@ class oddoCommander :
                     restart_command = "sudo systemctl restart odoo"
                     print("Reiniciando Odoo...")
                     os.system(restart_command)
-                    # Mostrar la respuesta de la terminal en la consola
-                    print("Listo...")
 
             if selected_option == "5":
                     clear_command = "clear"
