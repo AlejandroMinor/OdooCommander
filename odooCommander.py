@@ -48,10 +48,9 @@ class oddoCommander :
         while selected_option !=4 :
             
             print("""
-   ___     _             ___                              _         
-  / _ \ __| |___  ___   / __|___ _ __  _ __  __ _ _ _  __| |___ _ _ 
- | (_) / _` / _ \/ _ \ | (__/ _ \ '  \| '  \/ _` | ' \/ _` / -_) '_|
-  \___/\__,_\___/\___/  \___\___/_|_|_|_|_|_\__,_|_||_\__,_\___|_|                                                               
+  __         _                   
+ /  )_/     / )  _  _  _   _/_ _ 
+(__/(/()() (__()//)//)(//)(/(-/                                                                                     
 """)
             print(f"➡ Base actual {self.database_name}")
             print("1.- Actualizar la base \n2.- Actualizar solo un modulo\n3.- Cambiar base\n4.- Reinciar Odoo \n5.- Limpiar pantalla \n6.- Salir")
@@ -117,9 +116,10 @@ class oddoCommander :
                 option = input (f"Se reiniciara Odoo desea continuar ? (S/N) \n")
                 if option == "S" or option == "s":
                     restart_command = "sudo systemctl restart odoo"
+                    print("Reiniciando Odoo...")
                     os.system(restart_command)
                     # Mostrar la respuesta de la terminal en la consola
-                    print("Reiniciando Odoo...")
+                    print("Listo...")
 
             if selected_option == "5":
                     clear_command = "clear"
