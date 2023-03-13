@@ -49,10 +49,11 @@ class oddoCommander :
             
             print("""
   __         _                   
-                                                                                  
+ /  )_/     / )  _  _  _   _/_ _ 
+(__/(/()() (__()//)//)(//)(/(-/                                                                                     
 """)
             print(f"➡ Base actual {self.database_name}")
-            print("1.- Actualizar la base \n2.- Actualizar solo un modulo\n3.- Cambiar Base\n4.- Reinciar Odoo \n5.- Limpiar pantalla \n6.- Salir")
+            print("1.- Actualizar la base \n2.- Actualizar solo un modulo\n3.- Cambiar base\n4.- Reinciar Odoo \n5.- Limpiar pantalla \n6.- Salir")
             
             selected_option = input("Acción a realizar: \n")
 
