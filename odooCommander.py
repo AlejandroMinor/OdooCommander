@@ -1,3 +1,4 @@
+import datetime
 import os
 import subprocess
 from click import command
@@ -64,6 +65,7 @@ class oddoCommander :
     6. Mostrar log filtrado root (Nueva ventana)
     7. Mostrar log sin filtrado (Nueva ventana)
     8. Limpiar Pantalla
+    9. Cambiar fecha de caducidad a base de datos
     0. Salir
             """)
 
@@ -147,6 +149,13 @@ class oddoCommander :
 
             if selected_option == "8":
                     os.system("clear")
+
+            if selected_option == "9":
+                if YesNoOption("Desea cambiar la fecha de caducidad de la base de datos ?"):
+                    # Obtener la fecha actual y sumarle 1 mes para actualizar la fecha de caducidad
+                    expiration_date = datetime.date.today() + datetime.timedelta(days=30)
+                    # Ejecutar el comando psql para actualizar la fecha de caducidad
+                    os.system(f"sudo -u odoo psql -d {self.database_name} -c \"UPDATE ir_config_parameter SET value = '{expiration_date}' WHERE key='database.expiration_date';\"")
                 
             # Guardar los datos de las variables self.database_name y self.module en el archivo data.txt
             with open('data.txt', 'w') as f:
