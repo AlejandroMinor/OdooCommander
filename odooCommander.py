@@ -2,6 +2,7 @@ import os
 import subprocess
 from click import command
 import readline
+import subprocess
 
 
 class oddoCommander :
@@ -53,25 +54,39 @@ class oddoCommander :
 (__/(/()() (__()//)//)(//)(/(-/                                                                                     
 """)
             print(f"➡ Base actual {self.database_name}")
-            print("1.- Actualizar la base \n2.- Actualizar solo un modulo\n3.- Cambiar base\n4.- Reinciar Odoo \n5.- Limpiar pantalla \n6.- Salir")
             
+            print("""\
+    1. Actualizar la base
+    2. Actualizar solo un módulo
+    3. Cambiar de base
+    4. Reiniciar Odoo
+    5. Limpiar pantalla
+    6. Mostrar log filtrado root (Nueva ventana)
+    7. Mostrar log sin filtrado (Nueva ventana)
+    0. Salir
+            """)
+
+
+
             selected_option = input("Acción a realizar: \n")
 
+            if selected_option == "0":
+                print("Adios")
+                break
             
             if selected_option == "1" :
-                option = input (f"Se actualizara toda la base {self.database_name} desea continuar ? (S/N) \n")
-                if option == "S" or option == "s":
-                    # Llamar al metodo command y pasarle como parametro el nombre de la base y el modulo                    
-                    command(self.database_name,'all')
+                
+                if YesNoOption(f"Se actualizara toda la base {self.database_name} desea continuar ? "):
+                    # Llamar al metodo upDateOdooModules y pasarle como parametro el nombre de la base y el modulo                    
+                    upDateOdooModules(self.database_name,'all')
 
             if selected_option == "2" :
-                changeModule = input (f"Modulo actual {self.module} desea cambiarlo? (S/N)\n")
-                if changeModule == "S" or changeModule == "s":
+                if YesNoOption(f"Modulo actual {self.module} desea cambiarlo? "):
                      self.module = input("Ingresa el nombre del modulo (si son varios separar signo de coma sin usar espacios ejemplo modulo1,modulo2) ")   
-                option = input (f"Se actualizara la base {self.database_name} con {self.module} desea continuar ? (S/N) \n")
-                if option == "S" or option == "s":
-                    # Llamar al metodo command y pasarle como parametro el nombre de la base y el modulo
-                    command(self.database_name,self.module)
+                
+                if YesNoOption(f"Se actualizara la base {self.database_name} con {self.module} desea continuar ? "):
+                    # Llamar al metodo upDateOdooModules y pasarle como parametro el nombre de la base y el modulo
+                    upDateOdooModules(self.database_name,self.module)
 
             if selected_option == "3":
                 print("Puedes usar tab para autocompletar el nombre de la base de datos")
@@ -118,23 +133,39 @@ class oddoCommander :
                     restart_command = "sudo systemctl restart odoo"
                     print("Reiniciando Odoo...")
                     os.system(restart_command)
+                    print("Reinicio completado")
 
             if selected_option == "5":
                     clear_command = "clear"
                     os.system(clear_command)
 
             if selected_option == "6":
-                print("Adios")
-                break
+                if YesNoOption("Se mostrara el log filtrado por root desea continuar ?"):
+                    executeCommandNewTerminal("echo 'Mostrando log de root:' && sudo tail -f /var/log/odoo/odoo-server.log | grep root")
 
+            if selected_option == "7":
+                if YesNoOption("Se mostrara el log sin filtrar desea continuar ?"):
+                    executeCommandNewTerminal("echo 'Mostrando log sin filtrar:' && sudo tail -f /var/log/odoo/odoo-server.log")
+                
             # Guardar los datos de las variables self.database_name y self.module en el archivo data.txt
             with open('data.txt', 'w') as f:
                 f.write(f"db,{self.database_name}\n")
                 f.write(f"module,{self.module}")
 
-def command (db_name,module):
+def upDateOdooModules (db_name,module):
     command = f"sudo -u odoo odoo -c /etc/odoo/odoo.conf -d {db_name} -u {module} -p 8069 --no-http --load-language=es_MX --stop-after-init"
     os.system(command)
+
+def YesNoOption (message):
+    option = input (f"{message} (S/N) \n")
+    if option == "S" or option == "s":
+        return True
+    else:
+        return False
+
+def executeCommandNewTerminal (command):
+    subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', command])
+
 
 init = oddoCommander
 init()
