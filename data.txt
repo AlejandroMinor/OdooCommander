@@ -1,2 +1,2 @@
-db,SIIF_SIDIA-27-07-2022_4
-module,jt_agreement
+db,DB_NAME
+module,MODULE_NAME
