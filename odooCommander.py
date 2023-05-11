@@ -89,6 +89,7 @@ class oddoCommander :
                 if YesNoOption(f"Se actualizaran las traducciones {self.database_name} desea continuar ? "):
                     # Llamar al metodo upDateOdooModules y pasarle como parametro el nombre de la base y el modulo                    
                     updateTraduction(self.database_name)
+                    print("➡ Reiniciar sistema para que los cambios surtan efecto")
                 
             if selected_option == "4":
                 
@@ -97,7 +98,7 @@ class oddoCommander :
                     restart_command = "sudo systemctl restart odoo"
                     print("Reiniciando Odoo...")
                     os.system(restart_command)
-                    print("Reinicio completado")
+                    print("➡ Reinicio completado")
 
             if selected_option == "5":
                 # Inicializar la variable menu_logs_selected_option
@@ -138,7 +139,7 @@ class oddoCommander :
                     # Ejecutar el comando psql para actualizar la fecha de caducidad
                     os.system(f"sudo -u odoo psql -d {self.database_name} -c \"UPDATE ir_config_parameter SET value = '{expiration_date}' WHERE key='database.expiration_date';\"")
                     print(f"La fecha de caducidad de la base de datos {self.database_name} se actualizo a {expiration_date}")
-                    print("Reiniciar sistema para que los cambios surtan efecto")           
+                    print("➡ Reiniciar sistema para que los cambios surtan efecto")           
 
             if selected_option == "7":
                 
