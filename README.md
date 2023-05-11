@@ -1,6 +1,6 @@
 ## Descripción
 
-El objetivo de esta herramienta, llamada "oddoCommander", es mejorar el flujo de trabajo de los desarrolladores que trabajan con Odoo. Proporciona una interfaz de línea de comandos que elimina la necesidad de recordar los comandos relacionados con las actividades cotidianas en el uso de Odoo.
+El objetivo de esta herramienta, es mejorar el flujo de trabajo de los desarrolladores de Odoo. Proporciona una interfaz de terminal que elimina la necesidad de recordar los comandos relacionados con las actividades cotidianas en el uso de Odoo.
 
 Con oddoCommander, los desarrolladores pueden realizar fácilmente tareas como actualizar la base de datos, actualizar módulos específicos, actualizar traducciones, reiniciar Odoo, mostrar registros de log y cambiar la fecha de caducidad de la base de datos. La herramienta ofrece opciones intuitivas y claras para cada una de estas acciones, lo que facilita su ejecución sin la necesidad de escribir comandos complejos.
 
