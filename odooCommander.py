@@ -127,7 +127,7 @@ class oddoCommander :
                             # Ejecuta el comando tail para mostrar el log filtrado por root en una nueva ventana por medio de grep
                             executeCommandNewTerminal("echo 'Mostrando log de root:' && sudo tail -f /var/log/odoo/odoo-server.log | grep root")
                     
-                    if menu_parameters_selected_option == "2":
+                    if menu_logs_selected_option == "2":
                         if YesNoOption("Se mostrara el log sin filtrar desea continuar ?"):
                             # Ejecuta el comando tail para mostrar el log sin filtrar por grep en una nueva ventana
                             executeCommandNewTerminal("echo 'Mostrando log sin filtrar:' && sudo tail -f /var/log/odoo/odoo-server.log")
