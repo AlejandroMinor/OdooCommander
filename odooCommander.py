@@ -57,6 +57,7 @@ class oddoCommander :
             print(f"➡ Base actual {self.database_name} | Modulo actual {self.module}")
             
             print("""\
+    0. Salir
     1. Actualizar la base
     2. Actualizar módulo(s)
     3. Actualizar traducciones
@@ -64,8 +65,9 @@ class oddoCommander :
     5. Mostrar Logs
     6. Cambiar fecha de caducidad a base de datos
     7. Definir parametros [Base de datos y Modulo(s)]
-    8. Limpiar Pantalla
-    0. Salir
+    8. Odoo en modo terminal
+    9. Ejecutar Pruebas Unitarias
+    10. Limpiar Pantalla
             """)
 
             selected_option = input("Acción a realizar: \n")
@@ -79,17 +81,26 @@ class oddoCommander :
                 if YesNoOption(f"Se actualizara toda la base {self.database_name} desea continuar ? "):
                     # Llamar al metodo upDateOdooModules y pasarle como parametro el nombre de la base y el modulo                    
                     upDateOdooModules(self.database_name,'all')
+                    print("=============================================")
+                    print("El proceso de actualizacion de todos los modulos ha finalizado ")
+                    print("=============================================")
+
 
             if selected_option == "2" :
                 if YesNoOption(f"Se actualizara la base {self.database_name} con {self.module} desea continuar ? "):
                     # Llamar al metodo upDateOdooModules y pasarle como parametro el nombre de la base y el modulo
                     upDateOdooModules(self.database_name,self.module)
+                    print("=============================================")
+                    print("El proceso de actualizacion del modulo ha finalizado ")
+                    print("=============================================")
             
             if selected_option == "3":
                 if YesNoOption(f"Se actualizaran las traducciones {self.database_name} desea continuar ? "):
                     # Llamar al metodo upDateOdooModules y pasarle como parametro el nombre de la base y el modulo                    
                     updateTraduction(self.database_name)
+                    print("=============================================")
                     print("➡ Reiniciar sistema para que los cambios surtan efecto")
+                    print("=============================================")
                 
             if selected_option == "4":
                 
@@ -98,7 +109,9 @@ class oddoCommander :
                     restart_command = "sudo systemctl restart odoo"
                     print("Reiniciando Odoo...")
                     os.system(restart_command)
+                    print("=============================================")
                     print("➡ Reinicio completado")
+                    print("=============================================")
 
             if selected_option == "5":
                 # Inicializar la variable menu_logs_selected_option
@@ -127,7 +140,7 @@ class oddoCommander :
                             # Ejecuta el comando tail para mostrar el log filtrado por root en una nueva ventana por medio de grep
                             executeCommandNewTerminal("echo 'Mostrando log de root:' && sudo tail -f /var/log/odoo/odoo-server.log | grep root")
                     
-                    if menu_parameters_selected_option == "2":
+                    if menu_logs_selected_option == "2":
                         if YesNoOption("Se mostrara el log sin filtrar desea continuar ?"):
                             # Ejecuta el comando tail para mostrar el log sin filtrar por grep en una nueva ventana
                             executeCommandNewTerminal("echo 'Mostrando log sin filtrar:' && sudo tail -f /var/log/odoo/odoo-server.log")
@@ -207,11 +220,18 @@ class oddoCommander :
                         if YesNoOption(f"Modulo actual {self.module} desea cambiarlo? "):
                             self.module = input("Ingresa el nombre del modulo (si son varios separar signo de coma sin usar espacios ejemplo modulo1,modulo2) ")
 
-
             if selected_option == "8":
+                if YesNoOption(f"Se ejecutara Odoo en modo terminal desea continuar ? "):
+                    executeCommandNewTerminal(f"echo 'Iniciando odoo en modo terminal:' && sudo -u odoo odoo shell -c /etc/odoo/odoo.conf -d {self.database_name}")
+                    
+
+            if selected_option == "9":
+                if YesNoOption(f"Se ejecutaran pruebas unitarias del modulo seleccionado desea continuar ? "):
+                    executeCommandNewTerminal(f"echo 'Iniciando pruebas unitarias:' && sudo odoo --test-enable --stop-after-init -d '{self.database_name}' -i '{self.module}' -c /etc/odoo/odoo.conf")
+
+            if selected_option == "10":
                     os.system("clear")
 
-               
             # Guardar los datos de las variables self.database_name y self.module en el archivo data.txt
             with open('data.txt', 'w') as f:
                 f.write(f"db,{self.database_name}\n")
