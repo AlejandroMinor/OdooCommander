@@ -257,7 +257,7 @@ def YesNoOption (message):
 
 def executeCommandNewTerminal (command):
     # Funcion que recibe un parametro el comando a ejecutar y lo ejecuta en una nueva ventana
-    subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', command])
+    subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', f"{command}; bash -c 'read -p \"Presiona enter para cerrar...\"'"])
 
 # Inicializar la clase oddoCommander
 init = oddoCommander
