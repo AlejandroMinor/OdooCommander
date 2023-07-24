@@ -54,7 +54,7 @@ class oddoCommander :
  /  )_/     / )  _  _  _   _/_ _ 
 (__/(/()() (__()//)//)(//)(/(-/                                                                                     
 """)
-            print(f"➡ Base actual {self.database_name} | Modulo actual {self.module}")
+            print(f"  💻  Base actual {self.database_name} | Modulo actual {self.module} 💻")
             
             print("""\
     0. Salir
@@ -81,8 +81,9 @@ class oddoCommander :
                 if YesNoOption(f"Se actualizara toda la base {self.database_name} desea continuar ? "):
                     # Llamar al metodo upDateOdooModules y pasarle como parametro el nombre de la base y el modulo                    
                     upDateOdooModules(self.database_name,'all')
-                    print("=============================================")
-                    print("El proceso de actualizacion de todos los modulos ha finalizado ")
+                    time = datetime.datetime.now()
+                    print("=============================================")                    
+                    print(f"El proceso de actualizacion de todos los modulos ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})")
                     print("=============================================")
 
 
@@ -90,8 +91,9 @@ class oddoCommander :
                 if YesNoOption(f"Se actualizara la base {self.database_name} con {self.module} desea continuar ? "):
                     # Llamar al metodo upDateOdooModules y pasarle como parametro el nombre de la base y el modulo
                     upDateOdooModules(self.database_name,self.module)
+                    time = datetime.datetime.now()
                     print("=============================================")
-                    print("El proceso de actualizacion del modulo ha finalizado ")
+                    print(f"El proceso de actualizacion del modulo ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})")
                     print("=============================================")
             
             if selected_option == "3":
@@ -109,8 +111,9 @@ class oddoCommander :
                     restart_command = "sudo systemctl restart odoo"
                     print("Reiniciando Odoo...")
                     os.system(restart_command)
+                    time = datetime.datetime.now()
                     print("=============================================")
-                    print("➡ Reinicio completado")
+                    print(f"➡ Reinicio completado (⏳ {time.hour}:{time.minute}:{time.second})")
                     print("=============================================")
 
             if selected_option == "5":
