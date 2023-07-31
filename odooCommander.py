@@ -78,12 +78,17 @@ class oddoCommander :
             
             if selected_option == "1" :
                 
-                if YesNoOption(f"Se actualizara toda la base {self.database_name} desea continuar ? "):
+                if YesNoOption(f"Se detendra el servicio de Odoo y se actualizara toda la base {self.database_name} desea continuar ? "):
+                    command = "sudo systemctl restart odoo"
+                    print("Deteniendo Odoo...")
+                    os.system(command)
+                    print(" ✔️  Servicio detenido. Actualizando Modulos...")
                     # Llamar al metodo upDateOdooModules y pasarle como parametro el nombre de la base y el modulo                    
                     upDateOdooModules(self.database_name,'all')
                     time = datetime.datetime.now()
                     print("=============================================")                    
                     print(f"El proceso de actualizacion de todos los modulos ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})")
+                    print("El servicio de Odoo se ha iniciado")
                     print("=============================================")
 
 
