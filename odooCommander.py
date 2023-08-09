@@ -1,7 +1,6 @@
 import datetime
 import os
 import subprocess
-from click import command
 import readline
 import subprocess
 
@@ -78,13 +77,13 @@ class OddoCommander :
             
             if selected_option == "1" :
                 
-                if YesNoOption(f"Se detendra el servicio de Odoo y se actualizara toda la base {self.database_name} desea continuar ? "):
+                if self.yes_no_option(f"Se detendra el servicio de Odoo y se actualizara toda la base {self.database_name} desea continuar ? "):
                     command = "sudo systemctl restart odoo"
                     print("Deteniendo Odoo...")
                     os.system(command)
                     print(" ✔️  Servicio detenido. Actualizando Modulos...")
-                    # Llamar al metodo upDateOdooModules y pasarle como parametro el nombre de la base y el modulo                    
-                    upDateOdooModules(self.database_name,'all')
+                    # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo                    
+                    self.update_odoo_modules(self.database_name,'all')
                     time = datetime.datetime.now()
                     print("=============================================")                    
                     print(f"El proceso de actualizacion de todos los modulos ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})")
@@ -93,25 +92,25 @@ class OddoCommander :
 
 
             if selected_option == "2" :
-                if YesNoOption(f"Se actualizara la base {self.database_name} con {self.module} desea continuar ? "):
-                    # Llamar al metodo upDateOdooModules y pasarle como parametro el nombre de la base y el modulo
-                    upDateOdooModules(self.database_name,self.module)
+                if self.yes_no_option(f"Se actualizara la base {self.database_name} con {self.module} desea continuar ? "):
+                    # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo
+                    self.update_odoo_modules(self.database_name,self.module)
                     time = datetime.datetime.now()
                     print("=============================================")
                     print(f"El proceso de actualizacion del modulo ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})")
                     print("=============================================")
             
             if selected_option == "3":
-                if YesNoOption(f"Se actualizaran las traducciones {self.database_name} desea continuar ? "):
-                    # Llamar al metodo upDateOdooModules y pasarle como parametro el nombre de la base y el modulo                    
-                    updateTraduction(self.database_name)
+                if self.yes_no_option(f"Se actualizaran las traducciones {self.database_name} desea continuar ? "):
+                    # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo                    
+                    self.update_traduction(self.database_name)
                     print("=============================================")
                     print("➡ Reiniciar sistema para que los cambios surtan efecto")
                     print("=============================================")
                 
             if selected_option == "4":
                 
-                if YesNoOption("Se reiniciara Odoo desea continuar ? "):
+                if self.yes_no_option("Se reiniciara Odoo desea continuar ? "):
                     # Reinicia odoo con el comando systemctl
                     restart_command = "sudo systemctl restart odoo"
                     print("Reiniciando Odoo...")
@@ -144,17 +143,17 @@ class OddoCommander :
                         break
 
                     if menu_logs_selected_option == "1":
-                        if YesNoOption("Se mostrara el log filtrado por root desea continuar ?"):
+                        if self.yes_no_option("Se mostrara el log filtrado por root desea continuar ?"):
                             # Ejecuta el comando tail para mostrar el log filtrado por root en una nueva ventana por medio de grep
-                            executeCommandNewTerminal("echo 'Mostrando log de root:' && sudo tail -f /var/log/odoo/odoo-server.log | grep root")
+                            self.execute_command_new_terminal("echo 'Mostrando log de root:' && sudo tail -f /var/log/odoo/odoo-server.log | grep root")
                     
                     if menu_logs_selected_option == "2":
-                        if YesNoOption("Se mostrara el log sin filtrar desea continuar ?"):
+                        if self.yes_no_option("Se mostrara el log sin filtrar desea continuar ?"):
                             # Ejecuta el comando tail para mostrar el log sin filtrar por grep en una nueva ventana
-                            executeCommandNewTerminal("echo 'Mostrando log sin filtrar:' && sudo tail -f /var/log/odoo/odoo-server.log")
+                            self.execute_command_new_terminal("echo 'Mostrando log sin filtrar:' && sudo tail -f /var/log/odoo/odoo-server.log")
 
             if selected_option == "6":
-                if YesNoOption("Desea cambiar la fecha de caducidad de la base de datos ?"):
+                if self.yes_no_option("Desea cambiar la fecha de caducidad de la base de datos ?"):
                     # Obtener la fecha actual y sumarle 1 mes para actualizar la fecha de caducidad
                     expiration_date = datetime.date.today() + datetime.timedelta(days=30)
                     # Ejecutar el comando psql para actualizar la fecha de caducidad
@@ -196,17 +195,14 @@ class OddoCommander :
                         # Obtener la salida del comando
                         output, error = process.communicate()
                         # Guardar cada linea en una lista y luego imprimirlo
-                        lines = [""]
+                        data_bases = [""]
                         for line in output.decode("utf-8").splitlines():
-                            lines.append(f"{line}")
+                            data_bases.append(f"{line}")
                             print(line)
-
-                        # Definir la lista de elementos
-                        elementos = lines
 
                         # Configurar la autocompletación con la lista de elementos
                         def completer(text, state):
-                            options = [x for x in elementos if x.startswith(text)]
+                            options = [x for x in data_bases if x.startswith(text)]
                             if state < len(options):
                                 return options[state]
                             else:
@@ -225,17 +221,17 @@ class OddoCommander :
                             else:   
                                 bandera = True
                     if menu_parameters_selected_option == "2":
-                        if YesNoOption(f"Modulo actual {self.module} desea cambiarlo? "):
+                        if self.yes_no_option(f"Modulo actual {self.module} desea cambiarlo? "):
                             self.module = input("Ingresa el nombre del modulo (si son varios separar signo de coma sin usar espacios ejemplo modulo1,modulo2) ")
 
             if selected_option == "8":
-                if YesNoOption(f"Se ejecutara Odoo en modo terminal desea continuar ? "):
-                    executeCommandNewTerminal(f"echo 'Iniciando odoo en modo terminal:' && sudo -u odoo odoo shell -c /etc/odoo/odoo.conf -d {self.database_name}")
+                if self.yes_no_option(f"Se ejecutara Odoo en modo terminal desea continuar ? "):
+                    self.execute_command_new_terminal(f"echo 'Iniciando odoo en modo terminal:' && sudo -u odoo odoo shell -c /etc/odoo/odoo.conf -d {self.database_name}")
                     
 
             if selected_option == "9":
-                if YesNoOption(f"Se ejecutaran pruebas unitarias del modulo seleccionado desea continuar ? "):
-                    executeCommandNewTerminal(f"echo 'Iniciando pruebas unitarias:' && sudo odoo --test-enable --stop-after-init -d '{self.database_name}' -i '{self.module}' -c /etc/odoo/odoo.conf")
+                if self.yes_no_option(f"Se ejecutaran pruebas unitarias del modulo seleccionado desea continuar ? "):
+                    self.execute_command_new_terminal(f"echo 'Iniciando pruebas unitarias:' && sudo odoo --test-enable --stop-after-init -d '{self.database_name}' -i '{self.module}' -c /etc/odoo/odoo.conf")
 
             if selected_option == "10":
                     os.system("clear")
@@ -245,25 +241,25 @@ class OddoCommander :
                 f.write(f"db,{self.database_name}\n")
                 f.write(f"module,{self.module}")
 
-def upDateOdooModules (db_name,module):
-    #Funcion que recibe dos parametros el nombre de la base de datos y el modulo a actualizar para completar el comando y ejecutarlo
-    command = f"sudo -u odoo odoo -c /etc/odoo/odoo.conf -d {db_name} -u {module} -p 8069 --no-http --load-language=es_MX --stop-after-init"
-    os.system(command)
+    def update_odoo_modules (self,db_name,module):
+        #Funcion que recibe dos parametros el nombre de la base de datos y el modulo a actualizar para completar el comando y ejecutarlo
+        command = f"sudo -u odoo odoo -c /etc/odoo/odoo.conf -d {db_name} -u {module} -p 8069 --no-http --load-language=es_MX --stop-after-init"
+        os.system(command)
 
-def updateTraduction (db_name):
-    #Funcion que recibe un parametro el nombre de la base de datos para completar el comando y ejecutarlo
-    command = f"sudo -u odoo odoo -c /etc/odoo/odoo.conf -d {db_name} -p 8069 --no-http --load-language=es_MX --stop-after-init" 
-    os.system(command)
+    def update_traduction (self,db_name):
+        #Funcion que recibe un parametro el nombre de la base de datos para completar el comando y ejecutarlo
+        command = f"sudo -u odoo odoo -c /etc/odoo/odoo.conf -d {db_name} -p 8069 --no-http --load-language=es_MX --stop-after-init" 
+        os.system(command)
 
-def YesNoOption (message):
-    #Funcion que recibe un parametro el mensaje a mostrar y devuelve True si la respuesta es S o s y False si la respuesta es N o n
-    option = input (f"{message} (S/N) \n")
-    if option == "S" or option == "s":
-        return True
-    else:
-        return False
+    def yes_no_option (self,message):
+        #Funcion que recibe un parametro el mensaje a mostrar y devuelve True si la respuesta es S o s y False si la respuesta es N o n
+        option = input (f"{message} (S/N) \n")
+        if option == "S" or option == "s":
+            return True
+        else:
+            return False
 
-def executeCommandNewTerminal (command):
-    # Funcion que recibe un parametro el comando a ejecutar y lo ejecuta en una nueva ventana
-    subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', f"{command}; bash -c 'read -p \"Presiona enter para cerrar...\"'"])
+    def execute_command_new_terminal (self,command):
+        # Funcion que recibe un parametro el comando a ejecutar y lo ejecuta en una nueva ventana
+        subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', f"{command}; bash -c 'read -p \"Presiona enter para cerrar...\"'"])
 
