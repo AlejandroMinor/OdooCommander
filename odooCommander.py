@@ -6,7 +6,7 @@ import readline
 import subprocess
 
 
-class oddoCommander :
+class OddoCommander :
 
     def __init__ (self):
 
@@ -29,7 +29,7 @@ class oddoCommander :
         #Revisar si existe el archivo data.txt y si no existe crearlo
         if not os.path.exists('data.txt'):
             with open('data.txt', 'w') as f:
-                f.write(f"db, defaul \n")
+                f.write(f"db, default \n")
                 f.write(f"module,all")
         
         # Leer el archivo data.txt y guardar el dato de la clave db en la variable self.database_name y el dato de la clave module en la variable self.module
@@ -267,6 +267,3 @@ def executeCommandNewTerminal (command):
     # Funcion que recibe un parametro el comando a ejecutar y lo ejecuta en una nueva ventana
     subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', f"{command}; bash -c 'read -p \"Presiona enter para cerrar...\"'"])
 
-# Inicializar la clase oddoCommander
-init = oddoCommander
-init()
