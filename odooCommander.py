@@ -1,23 +1,22 @@
+import atexit
 import datetime
 import os
-import subprocess
 import readline
 import subprocess
-
 
 class OddoCommander :
 
     def __init__ (self):
 
         # Configurar el historial de comandos
-        histfile = os.path.join(os.environ['HOME'], '.pythonhistory')
-        try:
-            readline.read_history_file(histfile)
-            readline.set_history_length(1000)
-        except FileNotFoundError:
-            pass
-        import atexit
-        atexit.register(readline.write_history_file, histfile)
+        # histfile = os.path.join(os.environ['HOME'], '.pythonhistory')
+        # try:
+        #     readline.read_history_file(histfile)
+        #     readline.set_history_length(1000)
+        # except FileNotFoundError:
+        #     raise FileNotFoundError("No se encontro el archivo .pythonhistory")
+        
+        # atexit.register(readline.write_history_file, histfile)
 
 
         # Inicializar las variables self.database_name y self.module
