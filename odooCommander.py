@@ -1,4 +1,3 @@
-import atexit
 import datetime
 import os
 import readline
