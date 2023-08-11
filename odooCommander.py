@@ -14,12 +14,8 @@ class OddoCommander :
         self.data_bases_list=[]
 
 
-        #Revisar si existe el archivo data.txt y si no existe crearlo
-        if not os.path.exists('data.txt'):
-            with open('data.txt', 'w') as f:
-                f.write("db,default \n")
-                f.write("module,all \n")
-                f.write("path,PATH_TO_MODULES")
+
+        self.create_data_file()
         
         # Leer el archivo data.txt y guardar el dato de la clave db en la variable self.database_name y el dato de la clave module en la variable self.module
         with open('data.txt', 'r') as f:
@@ -189,16 +185,10 @@ class OddoCommander :
                 self.menu()
 
             if menu_parameters_selected_option == "1":                    
-                print("Puedes usar tab para autocompletar el nombre de la base de datos")
-                self.get_data_bases()
-                self.tab_autocomplete(self.data_bases_list)
-                self.database_name = self.verify_if_exist_in_list(self.data_bases_list,self.database_name,"Ingresa el nombre de la base de datos:")
+                self.define_database_name()
 
             if menu_parameters_selected_option == "2":
-                if self.yes_no_option(f"Modulo actual {self.module} desea cambiarlo? "):
-                    module_list = self.get_models_list()
-                    self.tab_autocomplete(module_list)
-                    self.module = self.verify_if_exist_in_list(module_list,self.module,"Ingresa el nombre del modulo (si son varios separar signo de coma sin usar espacios ejemplo modulo1,modulo2) ")
+                self.define_module_name()
             
             if menu_parameters_selected_option == "3":
                 self.define_modules_path()
@@ -258,7 +248,7 @@ class OddoCommander :
         
         for line in output.decode("utf-8").splitlines():
             self.data_bases_list.append(f"{line}")
-            print(line)
+        self.print_list(self.data_bases_list)
     
     def tab_autocomplete(self, list):
         readline.set_completer(lambda text, state: self.completer(list, text, state))
@@ -291,9 +281,51 @@ class OddoCommander :
                 bandera = True
                 return element
             
+    def define_database_name(self):
+        print("Puedes usar tab para autocompletar el nombre de la base de datos")
+        self.get_data_bases()
+        self.tab_autocomplete(self.data_bases_list)
+        self.database_name = self.verify_if_exist_in_list(self.data_bases_list,self.database_name,"Ingresa el nombre de la base de datos:")
+        print("Nuevo valor de la base de datos: ",self.database_name)
+        self.save_parameters()
+
+    def define_module_name(self):
+        print("Puedes usar tab para autocompletar el nombre del modulo")
+        module_list = self.get_models_list()
+        self.tab_autocomplete(module_list)
+        self.module = self.verify_if_exist_in_list(module_list,self.module,"Ingresa el nombre del modulo (si son varios separar signo de coma sin usar espacios ejemplo modulo1,modulo2) ")
+        print("Nuevo valor del modulo: ",self.module)
+        self.save_parameters()
+
     def define_modules_path(self):
-        if self.yes_no_option(f"Ruta actual {self.modules_path} desea cambiarla? "):
-            while not os.path.exists(self.modules_path):
-                self.modules_path = input("Ingresa la ruta de los modulos de Odoo: ")
-                if not os.path.exists(self.modules_path):
-                    print("La ruta no existe")
+        while not os.path.exists(self.modules_path):
+            self.modules_path = input("Ingresa la ruta de los modulos de Odoo (Ejemplo /home/minor/Custom_Odoo): ")
+            if not os.path.exists(self.modules_path):
+                print("La ruta no existe")
+        print("Nuevo valor de la ruta de los modulos: ",self.modules_path)
+        self.save_parameters()
+
+    def create_data_file(self):
+        if not os.path.exists('data.txt'):
+            print("El archivo data.txt no existe se creara uno nuevo")
+            print("Este archivo contiene los datos de configuracion de la aplicacion, estos pueden ser modificados en cualquier momento")
+        
+            print("Esta sera la base de datos con la cual estaras trabajando")
+            self.define_database_name()
+            
+            print("Esta ruta es donde tienes guardados tus modulos de Odoo customizados")
+            self.define_modules_path()
+
+            self.print_list(self.get_models_list())
+            print("Ingresa el nombre del modulo con el que estaras trabajando (Si aun no tienes uno asignado, selecciona cualquiera. Esta configuracion se puede modificar en cualquier momento)")
+            
+            self.define_module_name()
+
+            print("Archivo data.txt creado correctamente\n")
+            print(f"Nuevos valores de configuracion:\nBase de datos: {self.database_name}\nModulo: {self.module}\nRuta de los modulos: {self.modules_path}")
+
+    def print_list(self,list):
+        for element in list:
+            print(f"""
+    * {element}""")
+            
