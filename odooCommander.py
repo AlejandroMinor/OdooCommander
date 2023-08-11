@@ -12,7 +12,7 @@ class OddoCommander :
         self.module = ''
         self.modules_path = ''
         self.data_bases_list=[]
-
+        self.define_colors()
 
 
         self.create_data_file()
@@ -282,18 +282,16 @@ class OddoCommander :
                 return element
             
     def define_database_name(self):
-        print("Puedes usar tab para autocompletar el nombre de la base de datos")
         self.get_data_bases()
         self.tab_autocomplete(self.data_bases_list)
-        self.database_name = self.verify_if_exist_in_list(self.data_bases_list,self.database_name,"Ingresa el nombre de la base de datos:")
+        self.database_name = self.verify_if_exist_in_list(self.data_bases_list,self.database_name,"Ingresa el nombre de la base de datos (Puedes usar tab para autocompletar el nombre de la base de datos):")
         print("Nuevo valor de la base de datos: ",self.database_name)
         self.save_parameters()
 
     def define_module_name(self):
-        print("Puedes usar tab para autocompletar el nombre del modulo")
         module_list = self.get_models_list()
         self.tab_autocomplete(module_list)
-        self.module = self.verify_if_exist_in_list(module_list,self.module,"Ingresa el nombre del modulo (si son varios separar signo de coma sin usar espacios ejemplo modulo1,modulo2) ")
+        self.module = self.verify_if_exist_in_list(module_list,self.module,"Ingresa el nombre del modulo (Puedes usar tab para autocompletar el nombre del modulo) ")
         print("Nuevo valor del modulo: ",self.module)
         self.save_parameters()
 
@@ -307,25 +305,33 @@ class OddoCommander :
 
     def create_data_file(self):
         if not os.path.exists('data.txt'):
-            print("El archivo data.txt no existe se creara uno nuevo")
-            print("Este archivo contiene los datos de configuracion de la aplicacion, estos pueden ser modificados en cualquier momento")
+            print(self.RED+" \n⚠️  El archivo data.txt no existe se creara uno nuevo "+self.RESET)
+            print(self.RED+"Este archivo contiene los datos de configuracion de la aplicacion, estos pueden ser modificados en cualquier momento"+self.RESET)
         
-            print("Esta sera la base de datos con la cual estaras trabajando")
+            print("\n Esta sera la base de datos con la cual estaras trabajando \n")
             self.define_database_name()
             
-            print("Esta ruta es donde tienes guardados tus modulos de Odoo customizados")
+            print("\n Esta ruta es donde tienes guardados tus modulos de Odoo customizados")
             self.define_modules_path()
 
             self.print_list(self.get_models_list())
-            print("Ingresa el nombre del modulo con el que estaras trabajando (Si aun no tienes uno asignado, selecciona cualquiera. Esta configuracion se puede modificar en cualquier momento)")
+            print("\n Ingresa el nombre del modulo con el que estaras trabajando (Si aun no tienes uno asignado, selecciona cualquiera. Esta configuracion se puede modificar en cualquier momento)")
             
             self.define_module_name()
 
-            print("Archivo data.txt creado correctamente\n")
+            print(self.GREEN+"Archivo data.txt creado correctamente\n"+self.RESET)
             print(f"Nuevos valores de configuracion:\nBase de datos: {self.database_name}\nModulo: {self.module}\nRuta de los modulos: {self.modules_path}")
 
     def print_list(self,list):
         for element in list:
-            print(f"""
-    * {element}""")
+            print(self.GREEN + f"* {element}"+self.RESET)
+            
+    def define_colors(self):
+        self.RESET = '\033[0m'
+        self.RED = '\033[91m'
+        self.GREEN = '\033[92m'
+        self.YELLOW = '\033[93m'
+        self.BLUE = '\033[94m'
+        self.MAGENTA = '\033[95m'
+        self.CYAN = '\033[96m'
             
