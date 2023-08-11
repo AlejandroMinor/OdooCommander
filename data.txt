@@ -1,2 +1,3 @@
 db,DB_NAME
 module,MODULE_NAME
+path,PATH_TO_MODULES
