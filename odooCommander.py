@@ -11,13 +11,16 @@ class OddoCommander :
         # Inicializar las variables self.database_name y self.module
         self.database_name = ''
         self.module = ''
+        self.modules_path = ''
+        self.data_bases_list=[]
 
 
         #Revisar si existe el archivo data.txt y si no existe crearlo
         if not os.path.exists('data.txt'):
             with open('data.txt', 'w') as f:
                 f.write("db,default \n")
-                f.write("module,all")
+                f.write("module,all \n")
+                f.write("path,PATH_TO_MODULES")
         
         # Leer el archivo data.txt y guardar el dato de la clave db en la variable self.database_name y el dato de la clave module en la variable self.module
         with open('data.txt', 'r') as f:
@@ -26,6 +29,8 @@ class OddoCommander :
                     self.database_name = line.split(',')[1].strip()
                 if line.startswith('module'):
                     self.module = line.split(',')[1].strip()
+                if line.startswith('path'):
+                    self.modules_path = line.split(',')[1].strip()
 
         # Llamar al metodo menu 
         self.menu_options = {
@@ -175,6 +180,7 @@ class OddoCommander :
             print("""\
     1. Cambiar de base
     2. Cambiar modulo(s)
+    3. Definir ruta de modulos de Odoo
     0. Regresar...
                     """)
 
@@ -185,46 +191,21 @@ class OddoCommander :
 
             if menu_parameters_selected_option == "1":                    
                 print("Puedes usar tab para autocompletar el nombre de la base de datos")
-                # Ejecutar el comando psql para obtener el listado de bases de datos
-                #command_psql = "psql -h localhost -U odoo -d postgres -1 -c '\l'" 
-                command_psql = "psql -U odoo -l -t | cut -d'|' -f 1 | sed -e 's/ //g' -e '/^$/d'"
-                process = subprocess.Popen(command_psql, stdout=subprocess.PIPE, shell=True)
-                # Obtener la salida del comando
-                output, error = process.communicate()
-                # Guardar cada linea en una lista y luego imprimirlo
-                self.data_bases_list = [""]
-                for line in output.decode("utf-8").splitlines():
-                    self.data_bases_list.append(f"{line}")
-                    print(line)
+                self.get_data_bases()
+                self.tab_autocomplete(self.data_bases_list)
+                self.database_name = self.verify_if_exist_in_list(self.data_bases_list,self.database_name,"Ingresa el nombre de la base de datos:")
 
-                # Configurar la autocompletación con la lista de elementos
-                def completer(text, state):
-                    options = [x for x in self.data_bases_list if x.startswith(text)]
-                    if state < len(options):
-                        return options[state]
-                    else:
-                        return None
-
-                readline.set_completer(completer)
-                readline.parse_and_bind("tab: complete")
-
-                # Inicializar la variable bandera
-                bandera = False
-                while bandera == False:
-                    self.database_name = input("Ingresa el nombre de la base de datos: ")
-                    # verificar si la base de datos ingresada existe en line y si no existe mostrar un mensaje de error
-                    if self.database_name not in self.data_bases:
-                        print("LA BASE DE DATOS INGRESADA NO EXISTE!!!")
-                    else:   
-                        bandera = True
             if menu_parameters_selected_option == "2":
                 if self.yes_no_option(f"Modulo actual {self.module} desea cambiarlo? "):
-                    self.module = input("Ingresa el nombre del modulo (si son varios separar signo de coma sin usar espacios ejemplo modulo1,modulo2) ")
+                    module_list = self.get_models_list()
+                    self.tab_autocomplete(module_list)
+                    self.module = self.verify_if_exist_in_list(module_list,self.module,"Ingresa el nombre del modulo (si son varios separar signo de coma sin usar espacios ejemplo modulo1,modulo2) ")
+            
+            if menu_parameters_selected_option == "3":
+                self.define_modules_path()
 
-            # Guardar los datos de las variables self.database_name y self.module en el archivo data.txt
-            with open('data.txt', 'w') as f:
-                f.write(f"db,{self.database_name}\n")
-                f.write(f"module,{self.module}")
+                    
+            self.save_parameters()
 
     def terminal_mode(self):
         if self.yes_no_option("Se ejecutara Odoo en modo terminal desea continuar ? "):
@@ -259,3 +240,61 @@ class OddoCommander :
         # Funcion que recibe un parametro el comando a ejecutar y lo ejecuta en una nueva ventana
         subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', f"{command}; bash -c 'read -p \"Presiona enter para cerrar...\"'"])
 
+
+    def completer(self, list, text, state):
+        options = [name for name in list if name.startswith(text)]
+        if state < len(options):
+            return options[state]
+        else:
+            return None
+        
+    def get_data_bases(self):
+        # Ejecutar el comando psql para obtener el listado de bases de datos
+        #command_psql = "psql -h localhost -U odoo -d postgres -1 -c '\l'" 
+        command_psql = "psql -U odoo -l -t | cut -d'|' -f 1 | sed -e 's/ //g' -e '/^$/d'"
+        process = subprocess.Popen(command_psql, stdout=subprocess.PIPE, shell=True)
+        # Obtener la salida del comando
+        output, error = process.communicate()
+        # Guardar cada linea en una lista y luego imprimirlo
+        
+        for line in output.decode("utf-8").splitlines():
+            self.data_bases_list.append(f"{line}")
+            print(line)
+    
+    def tab_autocomplete(self, list):
+        readline.set_completer(lambda text, state: self.completer(list, text, state))
+        readline.parse_and_bind("tab: complete")
+
+
+    def save_parameters(self):
+        # Guardar los datos de las variables self.database_name y self.module en el archivo data.txt
+        with open('data.txt', 'w') as f:
+            f.write(f"db,{self.database_name}\n")
+            f.write(f"module,{self.module}\n")
+            f.write(f"path,{self.modules_path}")
+
+    def get_models_list(self):
+        # Verificar si el directorio existe
+        if not os.path.exists(self.modules_path):
+            print("La ruta no existe")
+            self.define_modules_path()
+        model_list = [nombre for nombre in os.listdir(self.modules_path) if os.path.isdir(os.path.join(self.modules_path, nombre))]
+        return model_list
+    
+    def verify_if_exist_in_list(self, list, element, message):
+        bandera = False
+        while bandera == False:
+            element = input(message)
+            # verificar si la base de datos ingresada existe en line y si no existe mostrar un mensaje de error
+            if element not in list:
+                print("Error el nombre ingresado no existe en la lista!!!")
+            else:   
+                bandera = True
+                return element
+            
+    def define_modules_path(self):
+        if self.yes_no_option(f"Ruta actual {self.modules_path} desea cambiarla? "):
+            while not os.path.exists(self.modules_path):
+                self.modules_path = input("Ingresa la ruta de los modulos de Odoo: ")
+                if not os.path.exists(self.modules_path):
+                    print("La ruta no existe")
