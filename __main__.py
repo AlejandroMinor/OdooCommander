@@ -1,3 +1,3 @@
 import odooCommander
 
-odooCommander.OddoCommander()
+odooCommander.OddoCommander().menu()

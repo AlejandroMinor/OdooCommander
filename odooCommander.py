@@ -43,7 +43,6 @@ class OddoCommander :
         }
 
 
-        self.menu()
     
     def show_title(self):
         print("""
