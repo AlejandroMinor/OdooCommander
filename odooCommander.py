@@ -2,6 +2,7 @@ import datetime
 import os
 import readline
 import subprocess
+from color_messagges import ColorfulMessages as cm
 
 class OddoCommander :
 
@@ -12,7 +13,6 @@ class OddoCommander :
         self.module = ''
         self.modules_path = ''
         self.data_bases_list=[]
-        self.define_colors()
 
 
         self.create_data_file()
@@ -80,24 +80,25 @@ class OddoCommander :
             if selected_option in self.menu_options:
                 self.menu_options[selected_option]()
             else:
-                print("Opción no válida. Intente nuevamente.")
+                cm.error("Opción no válida. Intente nuevamente.")
+                
 
     def close_program(self):
-        print("Adios")
+        cm.info("Hasta luego... no olvides revisar las nuevas versiones del programa")
         exit()
 
     def update_all_modules(self):
         if self.yes_no_option(f"Se detendra el servicio de Odoo y se actualizara toda la base {self.database_name} desea continuar ? "):
             command = "sudo systemctl restart odoo"
-            print("Deteniendo Odoo...")
+            cm.info("Deteniendo Odoo...")
             os.system(command)
-            print(" ✔️  Servicio detenido. Actualizando Modulos...")
+            cm.info(" ✔️  Servicio detenido. Actualizando Modulos...")
             # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo                    
             self.update_odoo_modules(self.database_name,'all')
             time = datetime.datetime.now()
             print("=============================================")                    
-            print(f"El proceso de actualizacion de todos los modulos ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})")
-            print("El servicio de Odoo se ha iniciado")
+            cm.ok(f"El proceso de actualizacion de todos los modulos ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})")
+            cm.info("El servicio de Odoo se ha iniciado")
             print("=============================================")
 
     def update_module(self):
@@ -106,7 +107,7 @@ class OddoCommander :
             self.update_odoo_modules(self.database_name,self.module)
             time = datetime.datetime.now()
             print("=============================================")
-            print(f"El proceso de actualizacion del modulo ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})")
+            cm.ok(f"El proceso de actualizacion del modulo ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})")
             print("=============================================")
             
     def update_translations(self):
@@ -114,24 +115,22 @@ class OddoCommander :
             # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo                    
             self.update_traduction(self.database_name)
             print("=============================================")
-            print("➡ Reiniciar sistema para que los cambios surtan efecto")
+            cm.info("Reiniciar sistema para que los cambios surtan efecto")
             print("=============================================")
 
     def restart_odoo(self):
         if self.yes_no_option("Se reiniciara Odoo desea continuar ? "):
             # Reinicia odoo con el comando systemctl
             restart_command = "sudo systemctl restart odoo"
-            print("Reiniciando Odoo...")
+            cm.info("Reiniciando Odoo...")
             os.system(restart_command)
             time = datetime.datetime.now()
             print("=============================================")
-            print(f"➡ Reinicio completado (⏳ {time.hour}:{time.minute}:{time.second})")
+            cm.ok(f"Reinicio completado (⏳ {time.hour}:{time.minute}:{time.second})")
             print("=============================================")
 
     def show_logs(self):
-        # Inicializar la variable menu_logs_selected_option
         menu_logs_selected_option = ''
-        # Ciclo para mostrar el menu
         while menu_logs_selected_option !=0 :
             self.show_title()
                     
@@ -161,8 +160,8 @@ class OddoCommander :
             expiration_date = datetime.date.today() + datetime.timedelta(days=30)
             # Ejecutar el comando psql para actualizar la fecha de caducidad
             os.system(f"sudo -u odoo psql -d {self.database_name} -c \"UPDATE ir_config_parameter SET value = '{expiration_date}' WHERE key='database.expiration_date';\"")
-            print(f"La fecha de caducidad de la base de datos {self.database_name} se actualizo a {expiration_date}")
-            print("➡ Reiniciar sistema para que los cambios surtan efecto")           
+            cm.ok(f"La fecha de caducidad de la base de datos {self.database_name} se actualizo a {expiration_date}")
+            cm.info("Reiniciar sistema para que los cambios surtan efecto")           
 
     def set_parameters(self):
                 
@@ -218,8 +217,9 @@ class OddoCommander :
         os.system(command)
 
     def yes_no_option (self,message):
-        #Funcion que recibe un parametro el mensaje a mostrar y devuelve True si la respuesta es S o s y False si la respuesta es N o n
+        cm.green()
         option = input (f"{message} (S/N) \n")
+        cm.reset()
         if option == "S" or option == "s":
             return True
         else:
@@ -248,7 +248,7 @@ class OddoCommander :
         
         for line in output.decode("utf-8").splitlines():
             self.data_bases_list.append(f"{line}")
-        self.print_list(self.data_bases_list)
+        cm.list_elements(self.data_bases_list)
     
     def tab_autocomplete(self, list):
         readline.set_completer(lambda text, state: self.completer(list, text, state))
@@ -265,7 +265,7 @@ class OddoCommander :
     def get_models_list(self):
         # Verificar si el directorio existe
         if not os.path.exists(self.modules_path):
-            print("La ruta no existe")
+            cm.error("La ruta no existe")
             self.define_modules_path()
         model_list = [nombre for nombre in os.listdir(self.modules_path) if os.path.isdir(os.path.join(self.modules_path, nombre))]
         return model_list
@@ -276,7 +276,7 @@ class OddoCommander :
             element = input(message)
             # verificar si la base de datos ingresada existe en line y si no existe mostrar un mensaje de error
             if element not in list:
-                print("Error el nombre ingresado no existe en la lista!!!")
+                cm.error("Error el nombre ingresado no existe en la lista!!!")
             else:   
                 bandera = True
                 return element
@@ -285,28 +285,28 @@ class OddoCommander :
         self.get_data_bases()
         self.tab_autocomplete(self.data_bases_list)
         self.database_name = self.verify_if_exist_in_list(self.data_bases_list,self.database_name,"Ingresa el nombre de la base de datos (Puedes usar tab para autocompletar el nombre de la base de datos):")
-        print("Nuevo valor de la base de datos: ",self.database_name)
+        cm.info(f"Nuevo valor de la base de datos: {self.database_name}")
         self.save_parameters()
 
     def define_module_name(self):
         module_list = self.get_models_list()
         self.tab_autocomplete(module_list)
         self.module = self.verify_if_exist_in_list(module_list,self.module,"Ingresa el nombre del modulo (Puedes usar tab para autocompletar el nombre del modulo) ")
-        print("Nuevo valor del modulo: ",self.module)
+        cm.info(f"Nuevo valor del modulo: {self.module}")
         self.save_parameters()
 
     def define_modules_path(self):
         while not os.path.exists(self.modules_path):
             self.modules_path = input("Ingresa la ruta de los modulos de Odoo (Ejemplo /home/minor/Custom_Odoo): ")
             if not os.path.exists(self.modules_path):
-                print("La ruta no existe")
-        print("Nuevo valor de la ruta de los modulos: ",self.modules_path)
+                cm.error("La ruta no existe")
+        cm.info(f"Nuevo valor de la ruta de los modulos: {self.modules_path}")
         self.save_parameters()
 
     def create_data_file(self):
         if not os.path.exists('data.txt'):
-            print(self.RED+" \n⚠️  El archivo data.txt no existe se creara uno nuevo "+self.RESET)
-            print(self.RED+"Este archivo contiene los datos de configuracion de la aplicacion, estos pueden ser modificados en cualquier momento"+self.RESET)
+            cm.error("El archivo data.txt no existe se creara uno nuevo ")
+            cm.info("Este archivo contiene los datos de configuracion de la aplicacion, estos pueden ser modificados en cualquier momento")
         
             print("\n Esta sera la base de datos con la cual estaras trabajando \n")
             self.define_database_name()
@@ -314,24 +314,14 @@ class OddoCommander :
             print("\n Esta ruta es donde tienes guardados tus modulos de Odoo customizados")
             self.define_modules_path()
 
-            self.print_list(self.get_models_list())
+            cm.list_elements(self.get_models_list())
             print("\n Ingresa el nombre del modulo con el que estaras trabajando (Si aun no tienes uno asignado, selecciona cualquiera. Esta configuracion se puede modificar en cualquier momento)")
             
             self.define_module_name()
 
-            print(self.GREEN+"Archivo data.txt creado correctamente\n"+self.RESET)
-            print(f"Nuevos valores de configuracion:\nBase de datos: {self.database_name}\nModulo: {self.module}\nRuta de los modulos: {self.modules_path}")
+            cm.ok("Archivo data.txt creado correctamente\n")
+            cm.info(f"Nuevos valores de configuracion:\nBase de datos: {self.database_name}\nModulo: {self.module}\nRuta de los modulos: {self.modules_path}")
 
-    def print_list(self,list):
-        for element in list:
-            print(self.GREEN + f"* {element}"+self.RESET)
+
             
-    def define_colors(self):
-        self.RESET = '\033[0m'
-        self.RED = '\033[91m'
-        self.GREEN = '\033[92m'
-        self.YELLOW = '\033[93m'
-        self.BLUE = '\033[94m'
-        self.MAGENTA = '\033[95m'
-        self.CYAN = '\033[96m'
             
