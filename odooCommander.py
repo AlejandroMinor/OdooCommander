@@ -1,8 +1,9 @@
+from color_messagges import ColorfulMessages as cm
 import datetime
 import os
 import readline
 import subprocess
-from color_messagges import ColorfulMessages as cm
+from tools import SystemTools as st
 
 class OddoCommander :
 
@@ -97,6 +98,8 @@ class OddoCommander :
             time = datetime.datetime.now()
             print("=============================================")                    
             cm.ok(f"El proceso de actualizacion de todos los modulos ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})")
+            st.send_important_notify(f"El proceso de actualizacion de todos los modulos ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})", 
+                                     "OdooCommander")
             cm.info("El servicio de Odoo se ha iniciado")
             print("=============================================")
 
@@ -107,6 +110,8 @@ class OddoCommander :
             time = datetime.datetime.now()
             print("=============================================")
             cm.ok(f"El proceso de actualizacion del modulo ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})")
+            st.send_important_notify(f"El proceso de actualizacion del modulo {self.module} ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})", 
+                                     "OdooCommander")
             print("=============================================")
             
     def update_translations(self):
@@ -126,6 +131,7 @@ class OddoCommander :
             time = datetime.datetime.now()
             print("=============================================")
             cm.ok(f"Reinicio completado (⏳ {time.hour}:{time.minute}:{time.second})")
+            st.send_notify(f"Reinicio completado (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
             print("=============================================")
 
     def show_logs(self):
