@@ -1,6 +1,6 @@
 import subprocess
 
-class SystemTools:
+class SystemNotify:
     @staticmethod
     def send_notify(message, title="Alert"):
         command = ['notify-send', title, message]
