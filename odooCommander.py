@@ -35,8 +35,6 @@ class OddoCommander :
             "10": self.clear_screen
         }
 
-
-    
     def show_title(self):
         print("""
   __         _                
@@ -73,7 +71,6 @@ class OddoCommander :
             else:
                 cm.error("Opción no válida. Intente nuevamente.")
                 
-
     def close_program(self):
         cm.info("Hasta luego... no olvides revisar las nuevas versiones del programa")
         exit()
@@ -192,7 +189,6 @@ class OddoCommander :
             if menu_parameters_selected_option == "4":
                 self.define_telegram_notifications()
 
-
     def terminal_mode(self):
         if self.yes_no_option("Se ejecutara Odoo en modo terminal desea continuar ? "):
             self.execute_command_new_terminal(f"echo 'Iniciando odoo en modo terminal:' && sudo -u odoo odoo shell -c /etc/odoo/odoo.conf -d {self.database_name}")
@@ -228,14 +224,13 @@ class OddoCommander :
         # Funcion que recibe un parametro el comando a ejecutar y lo ejecuta en una nueva ventana
         subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', f"{command}; bash -c 'read -p \"Presiona enter para cerrar...\"'"])
 
-
     def completer(self, list, text, state):
         options = [name for name in list if name.startswith(text)]
         if state < len(options):
             return options[state]
         else:
-            return None
-        
+            return None    
+    
     def get_data_bases(self):
         # Ejecutar el comando psql para obtener el listado de bases de datos
         #command_psql = "psql -h localhost -U odoo -d postgres -1 -c '\l'" 
@@ -252,7 +247,6 @@ class OddoCommander :
         readline.set_completer(lambda text, state: self.completer(list, text, state))
         readline.parse_and_bind("tab: complete")
 
-
     def save_parameters(self):
         with open(self.config_file_path, 'w') as f:
             f.write(f"db,{self.database_name}\n")
@@ -263,7 +257,6 @@ class OddoCommander :
             f.write(f"bot_chat_id,{self.bot_chat_id}")
         cm.info("Parametros guardados correctamente")
             
-
     def get_models_list(self):
         if not os.path.exists(self.modules_path):
             cm.error("La ruta no existe")
@@ -333,8 +326,7 @@ class OddoCommander :
                 cm.info(f"Valor de la opcion de notificaciones por Telegram: {use_telegram_bot}")
                 self.use_telegram_bot = use_telegram_bot
                 self.save_parameters()
-                break
-        
+                break    
 
     def create_data_file(self):
         cm.info("Este archivo contiene los datos de configuracion de la aplicacion, estos pueden ser modificados en cualquier momento")
