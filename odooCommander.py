@@ -42,15 +42,14 @@ class OddoCommander :
 (__/(/()() (__()//)//)(//)(/(-/                                                                                     
 =============================================
 """)
-        print(f"  💻  Base actual {self.database_name} | Modulo actual {self.module} 💻")
+        cm.green(f"  💻  Base actual {self.database_name} | Modulo actual {self.module} 💻")
+        cm.reset()
 
     def menu (self):
 
         selected_option = ''
-        while selected_option !=0 :
-            
+        while True:
             self.show_title()
-            
             print("""\
     0. Salir
     1. Actualizar la base
@@ -168,7 +167,7 @@ class OddoCommander :
         }
 
         menu_parameters_selected_option = ''
-        while menu_parameters_selected_option !=3:
+        while True:
             self.show_title()
         
             print("""\
