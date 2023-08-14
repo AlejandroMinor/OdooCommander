@@ -159,7 +159,14 @@ class OddoCommander :
             cm.info("Reiniciar sistema para que los cambios surtan efecto")           
 
     def set_parameters(self):
-                
+        parameters_menu = {
+            '0': self.menu,
+            '1': self.define_database_name,
+            '2': self.define_module_name,
+            '3': self.define_modules_path,
+            '4': self.define_telegram_notifications
+        }
+
         menu_parameters_selected_option = ''
         while menu_parameters_selected_option !=3:
             self.show_title()
@@ -173,21 +180,11 @@ class OddoCommander :
                     """)
 
             menu_parameters_selected_option = input("Acción a realizar: \n")
+            if menu_parameters_selected_option in self.menu_options:
+                parameters_menu[menu_parameters_selected_option]()
+            else:
+                cm.error("Opción no válida. Intente nuevamente.")
 
-            if menu_parameters_selected_option == "0":
-                self.menu()
-
-            if menu_parameters_selected_option == "1":                    
-                self.define_database_name()
-
-            if menu_parameters_selected_option == "2":
-                self.define_module_name()
-            
-            if menu_parameters_selected_option == "3":
-                self.define_modules_path()
-            
-            if menu_parameters_selected_option == "4":
-                self.define_telegram_notifications()
 
     def terminal_mode(self):
         if self.yes_no_option("Se ejecutara Odoo en modo terminal desea continuar ? "):
