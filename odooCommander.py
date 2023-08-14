@@ -1,4 +1,4 @@
-from color_messagges import ColorfulMessages as cm
+from color_messagges import ColorfulMessages as cm, Color
 import datetime
 import os
 import readline
@@ -20,7 +20,19 @@ class OddoCommander :
         self.check_config_file_exists(self.config_file_path)      
         self.get_parameters_from_file(self.config_file_path)
         
+    def show_title(self):
+        cm.green("""
+  __         _                
+ /  )_/     / )  _  _  _   _/_ _ 
+(__/(/()() (__()//)//)(//)(/(-/  
+""")
+        cm.reset()
+        print("  💻  Base actual " + Color.GREEN +
+              f"{self.database_name}" + Color.RESET 
+              + " | Modulo actual" + Color.GREEN + f" {self.module} 💻")
+        cm.reset()
 
+    def menu (self):
         self.menu_options = {
             "0": self.close_program,
             "1": self.update_all_modules,
@@ -35,19 +47,6 @@ class OddoCommander :
             "10": self.clear_screen
         }
 
-    def show_title(self):
-        print("""
-  __         _                
- /  )_/     / )  _  _  _   _/_ _ 
-(__/(/()() (__()//)//)(//)(/(-/                                                                                     
-=============================================
-""")
-        cm.green(f"  💻  Base actual {self.database_name} | Modulo actual {self.module} 💻")
-        cm.reset()
-
-    def menu (self):
-
-        selected_option = ''
         while True:
             self.show_title()
             print("""\
@@ -83,12 +82,12 @@ class OddoCommander :
             # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo                    
             self.update_odoo_modules(self.database_name,'all')
             time = datetime.datetime.now()
-            print("=============================================")
+            cm.separator()
             message = f"El proceso de actualizacion de todos los modulos ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})"                    
             cm.ok(message)
             sn.send_important_notify(message,"OdooCommander")
             cm.info("El servicio de Odoo se ha iniciado")
-            print("=============================================")
+            cm.separator()
             self.is_bot_active(message)
 
     def update_module(self):
@@ -96,20 +95,20 @@ class OddoCommander :
             # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo
             self.update_odoo_modules(self.database_name,self.module)
             time = datetime.datetime.now()
-            print("=============================================")
-            message = f"El proceso de actualizacion del modulo ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})"
+            cm.separator()
+            message = f"El proceso de actualizacion del modulo {self.module} ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})"
             cm.ok(message)
             sn.send_important_notify(message,"OdooCommander")
-            print("=============================================")
+            cm.separator()
             self.is_bot_active(message)
             
     def update_translations(self):
         if self.yes_no_option(f"Se actualizaran las traducciones {self.database_name} desea continuar ? "):
             # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo                    
             self.update_traduction(self.database_name)
-            print("=============================================")
+            cm.separator()
             cm.info("Reiniciar sistema para que los cambios surtan efecto")
-            print("=============================================")
+            cm.separator()
 
     def restart_odoo(self):
         if self.yes_no_option("Se reiniciara Odoo desea continuar ? "):
@@ -118,10 +117,10 @@ class OddoCommander :
             cm.info("Reiniciando Odoo...")
             os.system(restart_command)
             time = datetime.datetime.now()
-            print("=============================================")
+            cm.separator()
             cm.ok(f"Reinicio completado (⏳ {time.hour}:{time.minute}:{time.second})")
             sn.send_notify(f"Reinicio completado (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
-            print("=============================================")  
+            cm.separator()  
 
     def show_logs(self):
         menu_logs_selected_option = ''
