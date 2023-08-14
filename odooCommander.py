@@ -171,6 +171,7 @@ class OddoCommander :
     1. Cambiar de base
     2. Cambiar modulo(s)
     3. Definir ruta de modulos de Odoo
+    4. Configurar notificaciones de Telegram
     0. Regresar...
                     """)
 
@@ -187,9 +188,10 @@ class OddoCommander :
             
             if menu_parameters_selected_option == "3":
                 self.define_modules_path()
+            
+            if menu_parameters_selected_option == "4":
+                self.define_telegram_notifications()
 
-                    
-            self.save_parameters()
 
     def terminal_mode(self):
         if self.yes_no_option("Se ejecutara Odoo en modo terminal desea continuar ? "):
@@ -215,8 +217,9 @@ class OddoCommander :
     def yes_no_option (self,message):
         cm.green()
         option = input (f"{message} (S/N) \n")
+        option = option.lower()
         cm.reset()
-        if option == "S" or option == "s":
+        if option == "s":
             return True
         else:
             return False
@@ -258,6 +261,7 @@ class OddoCommander :
             f.write(f"use_telegram_bot,{self.use_telegram_bot}\n")
             f.write(f"bot_token,{self.bot_token}\n")
             f.write(f"bot_chat_id,{self.bot_chat_id}")
+        cm.info("Parametros guardados correctamente")
             
 
     def get_models_list(self):
@@ -298,6 +302,39 @@ class OddoCommander :
                 cm.error("La ruta no existe")
         cm.info(f"Nuevo valor de la ruta de los modulos: {self.modules_path}")
         self.save_parameters()
+
+    def define_telegram_notifications(self):
+        while True:
+            cm.info(f"Valor de la opcion de notificaciones por Telegram: {self.use_telegram_bot}")
+            cm.info(f"Valor del token del bot: {self.bot_token}")
+            cm.info(f"Valor del chat id: {self.bot_chat_id}")
+            bot_token = self.bot_token
+            bot_chat_id = self.bot_chat_id
+            use_telegram_bot = self.yes_no_option("Deseas recibir notificaciones por Telegram?")
+            if use_telegram_bot:
+                change_token = self.yes_no_option("Deseas cambiar el token del bot?")
+                if change_token:
+                    bot_token = input("Ingresa el token del bot: ")
+                change_chat_id = self.yes_no_option("Deseas cambiar el chat id?")
+                if change_chat_id:
+                    bot_chat_id = input("Ingresa el chat id: ")
+                cm.info(f"Valor de la opcion de notificaciones por Telegram: {use_telegram_bot}")
+                cm.info(f"Valor del token del bot: {bot_token}")
+                cm.info(f"Valor del chat id: {bot_chat_id}")
+                answer = self.yes_no_option("Deseas guardar los cambios?")
+                if answer:
+                    self.use_telegram_bot = "True"
+                    self.bot_token = bot_token
+                    self.bot_chat_id = bot_chat_id
+                    self.save_parameters()
+                    self.is_bot_active("Se activaron las notificaciones por Telegram")
+                break
+            else:
+                cm.info(f"Valor de la opcion de notificaciones por Telegram: {use_telegram_bot}")
+                self.use_telegram_bot = use_telegram_bot
+                self.save_parameters()
+                break
+        
 
     def create_data_file(self):
         cm.info("Este archivo contiene los datos de configuracion de la aplicacion, estos pueden ser modificados en cualquier momento")
@@ -347,7 +384,10 @@ class OddoCommander :
 
     def is_bot_active(self,message):
         if self.use_telegram_bot == 'True':
+            cm.ok("Enviando notificacion a Telegram")
             tn.send_telegram_message(self.bot_token, self.bot_chat_id, message)
+        else:
+            cm.info("Notificaciones por Telegram desactivadas")
 
     def check_config_file_exists(self,file):
         if not os.path.exists(file):
