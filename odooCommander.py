@@ -376,8 +376,13 @@ class OddoCommander :
 
     def is_bot_active(self,message):
         if self.use_telegram_bot == 'True':
-            cm.ok("Enviando notificacion a Telegram")
-            tn.send_telegram_message(self.bot_token, self.bot_chat_id, message)
+            try:
+                cm.ok("Enviando notificacion a Telegram...")
+                tn.send_telegram_message(self.bot_token, self.bot_chat_id, message)
+            except Exception as e:
+                cm.error(f"Error al enviar notificacion a Telegram: {e}")
+                cm.alert("Configura correctamente el token y el chat id del bot")
+                self.define_telegram_notifications()
         else:
             cm.info("Notificaciones por Telegram desactivadas")
 
