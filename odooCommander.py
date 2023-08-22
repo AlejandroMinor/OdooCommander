@@ -243,8 +243,11 @@ class OddoCommander :
         process = subprocess.Popen(command_psql, stdout=subprocess.PIPE, shell=True)
         # Obtener la salida del comando
         output, error = process.communicate()
-        # Guardar cada linea en una lista y luego imprimirlo
         
+        # Limpiar lista para evitar que se dupliquen los elementos
+        self.data_bases_list.clear()
+
+        # Guardar cada linea en una lista y luego imprimirlo
         for line in output.decode("utf-8").splitlines():
             self.data_bases_list.append(f"{line}")
         cm.list_elements(self.data_bases_list)
