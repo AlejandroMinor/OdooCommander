@@ -84,16 +84,14 @@ class OddoCommander :
             message = "El proceso de actualizacion de todos los modulos ha finalizado"                    
             self._result_process(res,message)
             cm.info("El servicio de Odoo se ha iniciado")
-            cm.separator()
-            self.is_bot_active(message)
+            cm.separator()        
 
     def update_module(self):
         if self.yes_no_option(f"Se actualizara la base {self.database_name} con {self.module} desea continuar ? "):
             # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo
             res = self.update_odoo_modules(self.database_name,self.module)
             message = f"El proceso de actualizacion del modulo {self.module} ha finalizado"
-            self._result_process(res,message)
-            self.is_bot_active(message)
+            self._result_process(res,message)        
             
     def update_translations(self):
         if self.yes_no_option(f"Se actualizaran las traducciones {self.database_name} desea continuar ? "):
@@ -393,3 +391,5 @@ class OddoCommander :
             cm.error(message)
             sn.send_important_notify(f"{message} (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
         cm.separator()
+
+        self.is_bot_active(message)
