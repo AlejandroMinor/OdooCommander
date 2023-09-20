@@ -108,9 +108,12 @@ class OddoCommander :
             # Reinicia odoo con el comando systemctl
             restart_command = "sudo systemctl restart odoo"
             cm.info("Reiniciando Odoo...")
-            res = os.system(restart_command)
+            os.system(restart_command)
             message = "El proceso de reinicio de Odoo ha finalizado"
-            self._result_process(res,message)
+            time = datetime.datetime.now()
+            cm.separator()
+            cm.ok(message)
+            sn.send_notify(f"{message} (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
 
     def show_logs(self):
         menu_logs_selected_option = ''
@@ -423,9 +426,12 @@ class OddoCommander :
             
     def stop_odoo(self):
         if self.yes_no_option("Se detendra Odoo desea continuar ? "):
-            # Detener odoo con el comando systemctl
-            stop_command = "sudo systemctl stop odoo"
-            cm.info("Deteniendo Odoo...")
-            os.system(stop_command)
-            cm.info("Servicio detenido")
+            command = "sudo systemctl stop odoo"
+            cm.info("Deteniendo servicio de Odoo...")
+            os.system(command)
+            message = "El servicio de Odoo se ha detenido"
+            time = datetime.datetime.now()
+            cm.separator()
+            cm.ok(message)
+            sn.send_notify(f"{message} (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
             
