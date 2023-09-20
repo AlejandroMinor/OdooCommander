@@ -34,7 +34,8 @@ class OddoCommander :
 
     def menu (self):
         self.menu_options = {
-            "0": self.close_program,
+            "q": self.close_program,
+            "0": self.stop_odoo,
             "1": self.update_all_modules,
             "2": self.update_module,
             "3": self.update_translations,
@@ -50,7 +51,8 @@ class OddoCommander :
         while True:
             self.show_title()
             print("""\
-    0. Salir
+    q. Salir
+    0. Detener servicio de Odoo
     1. Actualizar la base
     2. Actualizar módulo(s)
     3. Actualizar traducciones
@@ -419,4 +421,11 @@ class OddoCommander :
             cm.alert("Se desactivaron las notificaciones por Telegram")
             return False
             
-
+    def stop_odoo(self):
+        if self.yes_no_option("Se detendra Odoo desea continuar ? "):
+            # Detener odoo con el comando systemctl
+            stop_command = "sudo systemctl stop odoo"
+            cm.info("Deteniendo Odoo...")
+            os.system(stop_command)
+            cm.info("Servicio detenido")
+            
