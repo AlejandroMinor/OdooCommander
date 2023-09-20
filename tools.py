@@ -5,7 +5,7 @@ import subprocess
 class SystemNotify:
     @staticmethod
     def send_notify(message, title="Alert"):
-        command = ['notify-send', title, message]
+        command = ['notify-send', '-u', 'normal', title, message]
         subprocess.Popen(command)
     @staticmethod
     def send_important_notify(message, title="Alert"):
