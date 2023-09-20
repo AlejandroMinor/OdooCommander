@@ -51,7 +51,6 @@ class OddoCommander :
         while True:
             self.show_title()
             print("""\
-    q. Salir
     0. Detener servicio de Odoo
     1. Actualizar la base
     2. Actualizar módulo(s)
@@ -63,6 +62,7 @@ class OddoCommander :
     8. Odoo en modo terminal
     9. Ejecutar Pruebas Unitarias
     10. Limpiar Pantalla
+    q. Salir
             """)
 
             selected_option = input("Acción a realizar: ")
@@ -296,29 +296,32 @@ class OddoCommander :
             cm.info(f"Valor del chat id: {self.bot_chat_id}")
             bot_token = self.bot_token
             bot_chat_id = self.bot_chat_id
-            use_telegram_bot = self.yes_no_option("Deseas recibir notificaciones por Telegram?")
-            if use_telegram_bot:
-                change_token = self.yes_no_option("Deseas cambiar el token del bot?")
-                if change_token:
-                    bot_token = input("Ingresa el token del bot: ")
-                change_chat_id = self.yes_no_option("Deseas cambiar el chat id?")
-                if change_chat_id:
-                    bot_chat_id = input("Ingresa el chat id: ")
-                cm.info(f"Valor de la opcion de notificaciones por Telegram: {use_telegram_bot}")
-                cm.info(f"Valor del token del bot: {bot_token}")
-                cm.info(f"Valor del chat id: {bot_chat_id}")
-                answer = self.yes_no_option("Deseas guardar los cambios?")
-                if answer:
-                    self.use_telegram_bot = "True"
-                    self.bot_token = bot_token
-                    self.bot_chat_id = bot_chat_id
+            if self.yes_no_option("Deseas configurar las notificaciones por Telegram?"):
+                use_telegram_bot = self.yes_no_option("Deseas recibir notificaciones por Telegram?")
+                if use_telegram_bot:
+                    change_token = self.yes_no_option("Deseas cambiar el token del bot?")
+                    if change_token:
+                        bot_token = input("Ingresa el token del bot: ")
+                    change_chat_id = self.yes_no_option("Deseas cambiar el chat id?")
+                    if change_chat_id:
+                        bot_chat_id = input("Ingresa el chat id: ")
+                    cm.info(f"Valor de la opcion de notificaciones por Telegram: {use_telegram_bot}")
+                    cm.info(f"Valor del token del bot: {bot_token}")
+                    cm.info(f"Valor del chat id: {bot_chat_id}")
+                    answer = self.yes_no_option("Deseas guardar los cambios?")
+                    if answer:
+                        self.use_telegram_bot = "True"
+                        self.bot_token = bot_token
+                        self.bot_chat_id = bot_chat_id
+                        self.save_parameters()
+                        self.is_bot_active("Se activaron las notificaciones por Telegram")
+                    break
+                else:
+                    cm.info(f"Valor de la opcion de notificaciones por Telegram: {use_telegram_bot}")
+                    self.use_telegram_bot = use_telegram_bot
                     self.save_parameters()
-                    self.is_bot_active("Se activaron las notificaciones por Telegram")
-                break
+                    break
             else:
-                cm.info(f"Valor de la opcion de notificaciones por Telegram: {use_telegram_bot}")
-                self.use_telegram_bot = use_telegram_bot
-                self.save_parameters()
                 break    
 
     def create_data_file(self):
