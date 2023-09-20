@@ -80,12 +80,9 @@ class OddoCommander :
             os.system(command)
             cm.info(" ✔️  Servicio detenido. Actualizando Modulos...")
             # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo                    
-            self.update_odoo_modules(self.database_name,'all')
-            time = datetime.datetime.now()
-            cm.separator()
-            message = f"El proceso de actualizacion de todos los modulos ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})"                    
-            cm.ok(message)
-            sn.send_important_notify(message,"OdooCommander")
+            res = self.update_odoo_modules(self.database_name,'all')
+            message = "El proceso de actualizacion de todos los modulos ha finalizado"                    
+            self._result_process(res,message)
             cm.info("El servicio de Odoo se ha iniciado")
             cm.separator()
             self.is_bot_active(message)
@@ -93,13 +90,9 @@ class OddoCommander :
     def update_module(self):
         if self.yes_no_option(f"Se actualizara la base {self.database_name} con {self.module} desea continuar ? "):
             # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo
-            self.update_odoo_modules(self.database_name,self.module)
-            time = datetime.datetime.now()
-            cm.separator()
-            message = f"El proceso de actualizacion del modulo {self.module} ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})"
-            cm.ok(message)
-            sn.send_important_notify(message,"OdooCommander")
-            cm.separator()
+            res = self.update_odoo_modules(self.database_name,self.module)
+            message = f"El proceso de actualizacion del modulo {self.module} ha finalizado"
+            self._result_process(res,message)
             self.is_bot_active(message)
             
     def update_translations(self):
@@ -115,12 +108,9 @@ class OddoCommander :
             # Reinicia odoo con el comando systemctl
             restart_command = "sudo systemctl restart odoo"
             cm.info("Reiniciando Odoo...")
-            os.system(restart_command)
-            time = datetime.datetime.now()
-            cm.separator()
-            cm.ok(f"Reinicio completado (⏳ {time.hour}:{time.minute}:{time.second})")
-            sn.send_notify(f"Reinicio completado (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
-            cm.separator()  
+            res = os.system(restart_command)
+            message = "El proceso de reinicio de Odoo ha finalizado"
+            self._result_process(res,message)
 
     def show_logs(self):
         menu_logs_selected_option = ''
@@ -198,7 +188,8 @@ class OddoCommander :
     def update_odoo_modules (self,db_name,module):
         #Funcion que recibe dos parametros el nombre de la base de datos y el modulo a actualizar para completar el comando y ejecutarlo
         command = f"sudo -u odoo odoo -c /etc/odoo/odoo.conf -d {db_name} -u {module} -p 8069 --no-http --load-language=es_MX --stop-after-init"
-        os.system(command)
+        res = os.system(command)
+        return res
 
     def update_traduction (self,db_name):
         #Funcion que recibe un parametro el nombre de la base de datos para completar el comando y ejecutarlo
@@ -389,4 +380,16 @@ class OddoCommander :
         if not os.path.exists(file):
             cm.error(f"El archivo {file} no existe se creara uno nuevo ")
             self.create_data_file()
-            
+
+    def _result_process(self,result,message):
+        time = datetime.datetime.now()
+        cm.separator()
+        if result == 0:
+            message = f"{message} correctamente"
+            cm.ok(message)
+            sn.send_notify(f"{message} (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
+        else:
+            message = f"{message} con errores"
+            cm.error(message)
+            sn.send_important_notify(f"{message} (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
+        cm.separator()

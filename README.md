@@ -20,6 +20,7 @@ python3 odooCommander.py
 
 La herramienta oddoCommander proporciona las siguientes características y opciones:
 
+0.  Salir: Cierra la herramienta oddoCommander
 1. Actualizar la base: Permite actualizar todos los módulos de la base de datos especificada. 
 2.  Actualizar módulo(s): Permite actualizar los módulos específicos de la base de datos especificada.
 3.  Actualizar traducciones: Actualiza las traducciones en la base de datos especificada.
@@ -27,8 +28,10 @@ La herramienta oddoCommander proporciona las siguientes características y opcio
 5.  Mostrar Logs: Permite mostrar los registros de log de Odoo en una nueva ventana de terminal.
 6.  Cambiar fecha de caducidad a base de datos: Cambia la fecha de caducidad de la base de datos especificada.
 7.  Definir parámetros [Base de datos y Módulo(s)]: Permite cambiar la base de datos actual y los módulos a actualizar.
-8.  Limpiar Pantalla: Limpia la pantalla de la terminal.
-9.  Salir: Cierra la herramienta oddoCommander.
+8.  Ejecuta odoo en modo terminal con la base seleccionada
+9.  Ejecuta odoo en modo pruebas unitarias en el modulo seleccionado
+10.  Limpiar Pantalla: Limpia la pantalla de la terminal.
+
 
 ## Configuración
 
