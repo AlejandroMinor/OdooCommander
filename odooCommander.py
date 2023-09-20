@@ -1,33 +1,38 @@
+from color_messagges import ColorfulMessages as cm, Color
 import datetime
 import os
 import readline
 import subprocess
-from color_messagges import ColorfulMessages as cm
+from tools import SystemNotify as sn, TelegramNotify as tn
 
 class OddoCommander :
 
     def __init__ (self):
 
-        # Inicializar las variables self.database_name y self.module
         self.database_name = ''
         self.module = ''
         self.modules_path = ''
+        self.use_telegram_bot = ''
+        self.bot_token = ''
+        self.bot_chat_id = ''
         self.data_bases_list=[]
-
-
-        self.create_data_file()
+        self.config_file_path = "data.txt"
+        self.check_config_file_exists(self.config_file_path)      
+        self.get_parameters_from_file(self.config_file_path)
         
-        # Leer el archivo data.txt y guardar el dato de la clave db en la variable self.database_name y el dato de la clave module en la variable self.module
-        with open('data.txt', 'r') as f:
-            for line in f:
-                if line.startswith('db'):
-                    self.database_name = line.split(',')[1].strip()
-                if line.startswith('module'):
-                    self.module = line.split(',')[1].strip()
-                if line.startswith('path'):
-                    self.modules_path = line.split(',')[1].strip()
+    def show_title(self):
+        cm.green("""
+  __         _                
+ /  )_/     / )  _  _  _   _/_ _ 
+(__/(/()() (__()//)//)(//)(/(-/  
+""")
+        cm.reset()
+        print("  💻  Base actual " + Color.GREEN +
+              f"{self.database_name}" + Color.RESET 
+              + " | Modulo actual" + Color.GREEN + f" {self.module} 💻")
+        cm.reset()
 
-        # Llamar al metodo menu 
+    def menu (self):
         self.menu_options = {
             "0": self.close_program,
             "1": self.update_all_modules,
@@ -42,25 +47,8 @@ class OddoCommander :
             "10": self.clear_screen
         }
 
-
-    
-    def show_title(self):
-        print("""
-  __         _                
- /  )_/     / )  _  _  _   _/_ _ 
-(__/(/()() (__()//)//)(//)(/(-/                                                                                     
-=============================================
-""")
-        print(f"  💻  Base actual {self.database_name} | Modulo actual {self.module} 💻")
-
-    def menu (self):
-        # Inicializar la variable selected_option
-        selected_option = ''
-        # Ciclo para mostrar el menu
-        while selected_option !=0 :
-            
+        while True:
             self.show_title()
-            
             print("""\
     0. Salir
     1. Actualizar la base
@@ -81,7 +69,6 @@ class OddoCommander :
             else:
                 cm.error("Opción no válida. Intente nuevamente.")
                 
-
     def close_program(self):
         cm.info("Hasta luego... no olvides revisar las nuevas versiones del programa")
         exit()
@@ -95,27 +82,33 @@ class OddoCommander :
             # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo                    
             self.update_odoo_modules(self.database_name,'all')
             time = datetime.datetime.now()
-            print("=============================================")                    
-            cm.ok(f"El proceso de actualizacion de todos los modulos ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})")
+            cm.separator()
+            message = f"El proceso de actualizacion de todos los modulos ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})"                    
+            cm.ok(message)
+            sn.send_important_notify(message,"OdooCommander")
             cm.info("El servicio de Odoo se ha iniciado")
-            print("=============================================")
+            cm.separator()
+            self.is_bot_active(message)
 
     def update_module(self):
         if self.yes_no_option(f"Se actualizara la base {self.database_name} con {self.module} desea continuar ? "):
             # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo
             self.update_odoo_modules(self.database_name,self.module)
             time = datetime.datetime.now()
-            print("=============================================")
-            cm.ok(f"El proceso de actualizacion del modulo ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})")
-            print("=============================================")
+            cm.separator()
+            message = f"El proceso de actualizacion del modulo {self.module} ha finalizado (⏳ {time.hour}:{time.minute}:{time.second})"
+            cm.ok(message)
+            sn.send_important_notify(message,"OdooCommander")
+            cm.separator()
+            self.is_bot_active(message)
             
     def update_translations(self):
         if self.yes_no_option(f"Se actualizaran las traducciones {self.database_name} desea continuar ? "):
             # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo                    
             self.update_traduction(self.database_name)
-            print("=============================================")
+            cm.separator()
             cm.info("Reiniciar sistema para que los cambios surtan efecto")
-            print("=============================================")
+            cm.separator()
 
     def restart_odoo(self):
         if self.yes_no_option("Se reiniciara Odoo desea continuar ? "):
@@ -124,9 +117,10 @@ class OddoCommander :
             cm.info("Reiniciando Odoo...")
             os.system(restart_command)
             time = datetime.datetime.now()
-            print("=============================================")
+            cm.separator()
             cm.ok(f"Reinicio completado (⏳ {time.hour}:{time.minute}:{time.second})")
-            print("=============================================")
+            sn.send_notify(f"Reinicio completado (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
+            cm.separator()  
 
     def show_logs(self):
         menu_logs_selected_option = ''
@@ -163,36 +157,32 @@ class OddoCommander :
             cm.info("Reiniciar sistema para que los cambios surtan efecto")           
 
     def set_parameters(self):
-                
-        # Inicializar la variable menu_parameters_selected_option
+        parameters_menu = {
+            '0': self.menu,
+            '1': self.define_database_name,
+            '2': self.define_module_name,
+            '3': self.define_modules_path,
+            '4': self.define_telegram_notifications
+        }
+
         menu_parameters_selected_option = ''
-        # Ciclo para mostrar el menu
-        while menu_parameters_selected_option !=3:
+        while True:
             self.show_title()
         
             print("""\
     1. Cambiar de base
     2. Cambiar modulo(s)
     3. Definir ruta de modulos de Odoo
+    4. Configurar notificaciones de Telegram
     0. Regresar...
                     """)
 
             menu_parameters_selected_option = input("Acción a realizar: \n")
+            if menu_parameters_selected_option in self.menu_options:
+                parameters_menu[menu_parameters_selected_option]()
+            else:
+                cm.error("Opción no válida. Intente nuevamente.")
 
-            if menu_parameters_selected_option == "0":
-                self.menu()
-
-            if menu_parameters_selected_option == "1":                    
-                self.define_database_name()
-
-            if menu_parameters_selected_option == "2":
-                self.define_module_name()
-            
-            if menu_parameters_selected_option == "3":
-                self.define_modules_path()
-
-                    
-            self.save_parameters()
 
     def terminal_mode(self):
         if self.yes_no_option("Se ejecutara Odoo en modo terminal desea continuar ? "):
@@ -218,8 +208,9 @@ class OddoCommander :
     def yes_no_option (self,message):
         cm.green()
         option = input (f"{message} (S/N) \n")
+        option = option.lower()
         cm.reset()
-        if option == "S" or option == "s":
+        if option == "s":
             return True
         else:
             return False
@@ -228,14 +219,13 @@ class OddoCommander :
         # Funcion que recibe un parametro el comando a ejecutar y lo ejecuta en una nueva ventana
         subprocess.Popen(['gnome-terminal', '--', 'bash', '-c', f"{command}; bash -c 'read -p \"Presiona enter para cerrar...\"'"])
 
-
     def completer(self, list, text, state):
         options = [name for name in list if name.startswith(text)]
         if state < len(options):
             return options[state]
         else:
-            return None
-        
+            return None    
+    
     def get_data_bases(self):
         # Ejecutar el comando psql para obtener el listado de bases de datos
         #command_psql = "psql -h localhost -U odoo -d postgres -1 -c '\l'" 
@@ -256,27 +246,27 @@ class OddoCommander :
         readline.set_completer(lambda text, state: self.completer(list, text, state))
         readline.parse_and_bind("tab: complete")
 
-
     def save_parameters(self):
-        # Guardar los datos de las variables self.database_name y self.module en el archivo data.txt
-        with open('data.txt', 'w') as f:
+        with open(self.config_file_path, 'w') as f:
             f.write(f"db,{self.database_name}\n")
             f.write(f"module,{self.module}\n")
-            f.write(f"path,{self.modules_path}")
-
+            f.write(f"path,{self.modules_path}\n")
+            f.write(f"use_telegram_bot,{self.use_telegram_bot}\n")
+            f.write(f"bot_token,{self.bot_token}\n")
+            f.write(f"bot_chat_id,{self.bot_chat_id}")
+        cm.info("Parametros guardados correctamente")
+            
     def get_models_list(self):
-        # Verificar si el directorio existe
         if not os.path.exists(self.modules_path):
             cm.error("La ruta no existe")
             self.define_modules_path()
         model_list = [nombre for nombre in os.listdir(self.modules_path) if os.path.isdir(os.path.join(self.modules_path, nombre))]
         return model_list
     
-    def verify_if_exist_in_list(self, list, element, message):
+    def verify_if_exist_in_list(self, list, message):
         bandera = False
         while bandera == False:
             element = input(message)
-            # verificar si la base de datos ingresada existe en line y si no existe mostrar un mensaje de error
             if element not in list:
                 cm.error("Error el nombre ingresado no existe en la lista!!!")
             else:   
@@ -286,14 +276,14 @@ class OddoCommander :
     def define_database_name(self):
         self.get_data_bases()
         self.tab_autocomplete(self.data_bases_list)
-        self.database_name = self.verify_if_exist_in_list(self.data_bases_list,self.database_name,"Ingresa el nombre de la base de datos (Puedes usar tab para autocompletar el nombre de la base de datos):")
+        self.database_name = self.verify_if_exist_in_list(self.data_bases_list,"Ingresa el nombre de la base de datos (Puedes usar tab para autocompletar el nombre de la base de datos):")
         cm.info(f"Nuevo valor de la base de datos: {self.database_name}")
         self.save_parameters()
 
     def define_module_name(self):
         module_list = self.get_models_list()
         self.tab_autocomplete(module_list)
-        self.module = self.verify_if_exist_in_list(module_list,self.module,"Ingresa el nombre del modulo (Puedes usar tab para autocompletar el nombre del modulo) ")
+        self.module = self.verify_if_exist_in_list(module_list,"Ingresa el nombre del modulo (Puedes usar tab para autocompletar el nombre del modulo) ")
         cm.info(f"Nuevo valor del modulo: {self.module}")
         self.save_parameters()
 
@@ -305,25 +295,98 @@ class OddoCommander :
         cm.info(f"Nuevo valor de la ruta de los modulos: {self.modules_path}")
         self.save_parameters()
 
+    def define_telegram_notifications(self):
+        while True:
+            cm.info(f"Valor de la opcion de notificaciones por Telegram: {self.use_telegram_bot}")
+            cm.info(f"Valor del token del bot: {self.bot_token}")
+            cm.info(f"Valor del chat id: {self.bot_chat_id}")
+            bot_token = self.bot_token
+            bot_chat_id = self.bot_chat_id
+            use_telegram_bot = self.yes_no_option("Deseas recibir notificaciones por Telegram?")
+            if use_telegram_bot:
+                change_token = self.yes_no_option("Deseas cambiar el token del bot?")
+                if change_token:
+                    bot_token = input("Ingresa el token del bot: ")
+                change_chat_id = self.yes_no_option("Deseas cambiar el chat id?")
+                if change_chat_id:
+                    bot_chat_id = input("Ingresa el chat id: ")
+                cm.info(f"Valor de la opcion de notificaciones por Telegram: {use_telegram_bot}")
+                cm.info(f"Valor del token del bot: {bot_token}")
+                cm.info(f"Valor del chat id: {bot_chat_id}")
+                answer = self.yes_no_option("Deseas guardar los cambios?")
+                if answer:
+                    self.use_telegram_bot = "True"
+                    self.bot_token = bot_token
+                    self.bot_chat_id = bot_chat_id
+                    self.save_parameters()
+                    self.is_bot_active("Se activaron las notificaciones por Telegram")
+                break
+            else:
+                cm.info(f"Valor de la opcion de notificaciones por Telegram: {use_telegram_bot}")
+                self.use_telegram_bot = use_telegram_bot
+                self.save_parameters()
+                break    
+
     def create_data_file(self):
-        if not os.path.exists('data.txt'):
-            cm.error("El archivo data.txt no existe se creara uno nuevo ")
-            cm.info("Este archivo contiene los datos de configuracion de la aplicacion, estos pueden ser modificados en cualquier momento")
+        cm.info("Este archivo contiene los datos de configuracion de la aplicacion, estos pueden ser modificados en cualquier momento")
+    
+        print("\n Esta sera la base de datos con la cual estaras trabajando \n")
+        self.define_database_name()
         
-            print("\n Esta sera la base de datos con la cual estaras trabajando \n")
-            self.define_database_name()
+        print("\n Esta ruta es donde tienes guardados tus modulos de Odoo customizados")
+        self.define_modules_path()
+
+        cm.list_elements(self.get_models_list())
+        print("\n Ingresa el nombre del modulo con el que estaras trabajando (Si aun no tienes uno asignado, selecciona cualquiera. Esta configuracion se puede modificar en cualquier momento)")
+        
+        self.define_module_name()
+
+        cm.ok("Archivo de configuración se ha creado correctamente\n")
+        cm.info(f"Nuevos valores de configuracion:\nBase de datos: {self.database_name}\nModulo: {self.module}\nRuta de los modulos: {self.modules_path}")
+
+    def get_parameters_from_file(self,config_file):
+
+        try:
+            data = {
+                'db': None,
+                'module': None,
+                'path': None,
+                'use_telegram_bot': None,
+                'bot_token': None,
+                'bot_chat_id': None
+            }
             
-            print("\n Esta ruta es donde tienes guardados tus modulos de Odoo customizados")
-            self.define_modules_path()
-
-            cm.list_elements(self.get_models_list())
-            print("\n Ingresa el nombre del modulo con el que estaras trabajando (Si aun no tienes uno asignado, selecciona cualquiera. Esta configuracion se puede modificar en cualquier momento)")
+            with open(config_file, 'r') as f:
+                for line in f:
+                    key, value = line.strip().split(',')
+                    data[key] = value
             
-            self.define_module_name()
+            self.database_name = data['db']
+            self.module = data['module']
+            self.modules_path = data['path']
+            self.use_telegram_bot = data['use_telegram_bot']
+            self.bot_token = data['bot_token']
+            self.bot_chat_id = data['bot_chat_id']
 
-            cm.ok("Archivo data.txt creado correctamente\n")
-            cm.info(f"Nuevos valores de configuracion:\nBase de datos: {self.database_name}\nModulo: {self.module}\nRuta de los modulos: {self.modules_path}")
+        except Exception as e:
+            cm.error(f"Error al leer el archivo de configuracion: {e}")
+            cm.alert("Se creara un nuevo archivo de configuracion")
+            self.create_data_file()
 
+    def is_bot_active(self,message):
+        if self.use_telegram_bot == 'True':
+            try:
+                cm.ok("Enviando notificacion a Telegram...")
+                tn.send_telegram_message(self.bot_token, self.bot_chat_id, message)
+            except Exception as e:
+                cm.error(f"Error al enviar notificacion a Telegram: {e}")
+                cm.alert("Configura correctamente el token y el chat id del bot")
+                self.define_telegram_notifications()
+        else:
+            cm.info("Notificaciones por Telegram desactivadas")
 
-            
+    def check_config_file_exists(self,file):
+        if not os.path.exists(file):
+            cm.error(f"El archivo {file} no existe se creara uno nuevo ")
+            self.create_data_file()
             

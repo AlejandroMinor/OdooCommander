@@ -8,6 +8,7 @@ class Color:
     BLUE = '\033[94m'
     MAGENTA = '\033[95m'
     CYAN = '\033[96m'
+    
 
 class Emoji:
     OK = "✅"
@@ -50,6 +51,10 @@ class ColorfulMessages:
     def list_elements(list):
         for element in list:
             print(f"{Color.BLUE}{Emoji.FLOPPY_DISK}  {element}{Color.RESET}")
+
+    @staticmethod
+    def separator():
+        print(f"{Color.RESET}{'=' * 80}{Color.RESET}")
 
 
 # Uso de las funciones
