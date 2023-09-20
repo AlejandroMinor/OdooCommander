@@ -364,13 +364,18 @@ class OddoCommander :
 
     def is_bot_active(self,message):
         if self.use_telegram_bot == 'True':
-            try:
-                cm.ok("Enviando notificacion a Telegram...")
-                tn.send_telegram_message(self.bot_token, self.bot_chat_id, message)
-            except Exception as e:
-                cm.error(f"Error al enviar notificacion a Telegram: {e}")
-                cm.alert("Configura correctamente el token y el chat id del bot")
-                self.define_telegram_notifications()
+            if self.verify_telegram_library():
+                try:
+                    cm.ok("Enviando notificacion a Telegram...")
+                    tn.send_telegram_message(self.bot_token, self.bot_chat_id, message)
+                except Exception as e:
+                    cm.error(f"Error al enviar notificacion a Telegram: {e}")
+                    cm.alert("Configura correctamente el token y el chat id del bot")
+                    if self.yes_no_option("Deseas configurar el token y el chat id del bot?"):
+                        self.define_telegram_notifications()
+                    else: 
+                        self.use_telegram_bot = "False"
+                        cm.alert("Se desactivaron las notificaciones por Telegram")
         else:
             cm.info("Notificaciones por Telegram desactivadas")
 
@@ -393,3 +398,25 @@ class OddoCommander :
         cm.separator()
 
         self.is_bot_active(message)
+
+    def verify_telegram_library(self):
+        try:
+            import telegram
+            return True
+        except Exception as e:
+            cm.error(f"Error al importar la libreria python-telegram-bot: {e}")
+            cm.alert("Instala la libreria para poder usar esta funcionalidad")
+            return self.install_telegram_library('python-telegram-bot')
+
+    def install_telegram_library(self,library):
+        if self.yes_no_option(f"Desea instalar la libreria {library} ? "):
+            cm.info(f"Instalando libreria {library}")
+            os.system(f"sudo pip install {library}")
+            return True
+        else:
+            cm.alert("No se instalo la libreria")
+            self.use_telegram_bot = "False"
+            cm.alert("Se desactivaron las notificaciones por Telegram")
+            return False
+            
+

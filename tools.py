@@ -1,4 +1,3 @@
-from telegram import Bot
 import asyncio
 import subprocess
 
@@ -19,6 +18,7 @@ class SystemNotify:
 class TelegramNotify:
     @staticmethod
     async def conector(bot_token, chat_id, message):
+        from telegram import Bot
         bot=Bot(token=bot_token)
         await bot.send_message(chat_id, text=message)
 
