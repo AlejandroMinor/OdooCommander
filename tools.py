@@ -54,6 +54,7 @@ class TelegramNotify:
 #TelegramNotify.send_telegram_message(bot_token,chat_id,message)
 
 class CheckVersion:
+    @staticmethod
     def check_for_update():
         try:
             project_path = os.path.dirname(os.path.realpath(__file__))
