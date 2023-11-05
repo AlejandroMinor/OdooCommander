@@ -189,11 +189,23 @@ class OddoCommander :
 
     def terminal_mode(self):
         if self.yes_no_option("Se ejecutara Odoo en modo terminal desea continuar ? "):
-            self.execute_command_new_terminal(f"echo 'Iniciando odoo en modo terminal:' && sudo -u odoo odoo shell -c /etc/odoo/odoo.conf -d {self.database_name}")
+            command = f"echo 'Iniciando odoo en modo terminal:' && sudo -u odoo odoo shell -c /etc/odoo/odoo.conf -d {self.database_name}"
+            try:
+                self.execute_command_new_terminal(command)
+            except Exception as e:
+                cm.error(f"Error al mostrar Odoo modo Terminal en nueva ventana. {e}")
+                cm.alert("Se mostrara en la misma ventana")
+                os.system(command)
                     
     def run_unit_tests(self):
         if self.yes_no_option("Se ejecutaran pruebas unitarias del modulo seleccionado desea continuar ? "):
-            self.execute_command_new_terminal(f"echo 'Iniciando pruebas unitarias:' && sudo odoo --test-enable --stop-after-init -d '{self.database_name}' -i '{self.module}' -c /etc/odoo/odoo.conf")
+            command = f"echo 'Iniciando pruebas unitarias:' && sudo odoo --test-enable --stop-after-init -d '{self.database_name}' -i '{self.module}' -c /etc/odoo/odoo.conf"
+            try:
+                self.execute_command_new_terminal(command)
+            except Exception as e:
+                cm.error(f"Error al mostrar las pruebas unitarias en nueva ventana. {e}")
+                cm.alert("Se mostrara en la misma ventana")
+                os.system(command)
 
     def clear_screen(self):
         os.system("clear")
