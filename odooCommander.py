@@ -129,16 +129,26 @@ class OddoCommander :
 
             if menu_logs_selected_option == "0":
                 self.menu()
+            command = "echo 'Mostrando log de root:' && sudo tail -f /var/log/odoo/odoo-server.log"
 
             if menu_logs_selected_option == "1":
                 if self.yes_no_option("Se mostrara el log filtrado por root desea continuar ?"):
-                    # Ejecuta el comando tail para mostrar el log filtrado por root en una nueva ventana por medio de grep
-                    self.execute_command_new_terminal("echo 'Mostrando log de root:' && sudo tail -f /var/log/odoo/odoo-server.log | grep root")
+                    try:
+                        self.execute_command_new_terminal(f" {command} | grep root")
+                    except Exception as e:
+                        cm.error(f"Error al mostrar el log en nueva ventana. {e}")
+                        cm.alert("Se mostrara el log en la misma ventana")
+                        os.system(command)
             
             if menu_logs_selected_option == "2":
                 if self.yes_no_option("Se mostrara el log sin filtrar desea continuar ?"):
-                    # Ejecuta el comando tail para mostrar el log sin filtrar por grep en una nueva ventana
-                    self.execute_command_new_terminal("echo 'Mostrando log sin filtrar:' && sudo tail -f /var/log/odoo/odoo-server.log")
+                    try:
+                        self.execute_command_new_terminal(f" {command} | grep root")
+                    except Exception as e:
+                        cm.error(f"Error al mostrar el log en nueva ventana. {e}")
+                        cm.alert("Se mostrara el log en la misma ventana")
+                        os.system(command)
+
 
     def change_expiration_date(self):
         if self.yes_no_option("Desea cambiar la fecha de caducidad de la base de datos ?"):
