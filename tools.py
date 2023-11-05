@@ -57,7 +57,6 @@ class CheckVersion:
     def check_for_update():
         try:
             project_path = os.path.dirname(os.path.realpath(__file__))
-            print(project_path)
             os.chdir(project_path)
             subprocess.run(['git', 'fetch'], check=True)
 
