@@ -1,5 +1,6 @@
 import asyncio
 import subprocess
+import os
 from color_messagges import ColorfulMessages as cm, Color
 
 class SystemNotify:
@@ -51,3 +52,22 @@ class TelegramNotify:
 # Ejemplo de uso
 #message = "OdooCommander terminó de ejecutar la actualización de los módulos"
 #TelegramNotify.send_telegram_message(bot_token,chat_id,message)
+
+class CheckVersion:
+    def check_for_update():
+        try:
+            project_path = os.path.dirname(os.path.realpath(__file__))
+            print(project_path)
+            os.chdir(project_path)
+            subprocess.run(['git', 'fetch'], check=True)
+
+            result = subprocess.run(['git', 'status', '-sb'], capture_output=True, text=True, check=True)
+
+            if "[" in result.stdout:
+                cm.notice("Nueva versión disponible.")
+            
+            else:
+                cm.notice("Odoo Commander está actualizado.")
+
+        except Exception as e:
+            cm.error(f"Error al intentar revisar versión: {e}")
