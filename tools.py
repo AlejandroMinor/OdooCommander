@@ -1,19 +1,40 @@
 import asyncio
 import subprocess
+from color_messagges import ColorfulMessages as cm, Color
 
 class SystemNotify:
     @staticmethod
     def send_notify(message, title="Alert"):
-        command = ['notify-send', '-u', 'normal', title, message]
-        subprocess.Popen(command)
+        try:
+            command = ['notify-send', '-u', 'normal', title, message]
+            subprocess.Popen(command)
+        except FileNotFoundError:
+            cm.error("El comando 'notify-send' no está disponible en este sistema.")
+        
+        except PermissionError as e:
+            cm.error(f"Error de permisos al enviar notificación: {e}")
+
+        except Exception as e:
+            cm.error("Error al enviar notificación: ", e)
+
     @staticmethod
     def send_important_notify(message, title="Alert"):
-        command = ['notify-send', '-u', 'critical', title, message]
-        subprocess.Popen(command)
+        try:
+            #command = ['notify-send', '-u', 'critical', title, message]
+            command = ['notify-send', '-u', 'critical', '-t', '15000', title, message]
+            subprocess.Popen(command)
+        except FileNotFoundError:
+            print("El comando 'notify-send' no está disponible en este sistema.")
+        
+        except PermissionError as e:
+            print(f"Error de permisos al enviar notificación: {e}")
+
+        except Exception as e:
+            print("Error al enviar notificación: ", e)
 
 # Ejemplo de uso
-# SystemTools.send_notify("Hola mundo", "Hola")
-# SystemTools.send_important_notify("Hola mundo", "Hola")
+# SystemNotify.send_notify("Este es un mensaje de prueba", "Notificación")
+# SystemNotify.send_important_notify("Esto es importante", "Notificación Crítica")
 
 class TelegramNotify:
     @staticmethod
