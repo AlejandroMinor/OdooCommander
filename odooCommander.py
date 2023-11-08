@@ -3,7 +3,7 @@ import datetime
 import os
 import readline
 import subprocess
-from tools import SystemNotify as sn, TelegramNotify as tn, Secutiry
+from tools import SystemNotify as sn, TelegramNotify as tn, Secutiry, Utils
 
 class OddoCommander :
 
@@ -78,7 +78,7 @@ class OddoCommander :
         exit()
 
     def update_all_modules(self):
-        if self.yes_no_option(f"Se detendra el servicio de Odoo y se actualizara toda la base {self.database_name} desea continuar ? "):
+        if Utils.yes_no_option(f"Se detendra el servicio de Odoo y se actualizara toda la base {self.database_name} desea continuar ? "):
             command = "sudo systemctl restart odoo"
             cm.info("Deteniendo Odoo...")
             os.system(command)
@@ -91,14 +91,14 @@ class OddoCommander :
             cm.separator()        
 
     def update_module(self):
-        if self.yes_no_option(f"Se actualizara la base {self.database_name} con {self.module} desea continuar ? "):
+        if Utils.yes_no_option(f"Se actualizara la base {self.database_name} con {self.module} desea continuar ? "):
             # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo
             res = self.update_odoo_modules(self.database_name,self.module)
             message = f"El proceso de actualizacion del modulo {self.module} ha finalizado"
             self._result_process(res,message)        
             
     def update_translations(self):
-        if self.yes_no_option(f"Se actualizaran las traducciones {self.database_name} desea continuar ? "):
+        if Utils.yes_no_option(f"Se actualizaran las traducciones {self.database_name} desea continuar ? "):
             # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo                    
             self.update_traduction(self.database_name)
             cm.separator()
@@ -106,7 +106,7 @@ class OddoCommander :
             cm.separator()
 
     def restart_odoo(self):
-        if self.yes_no_option("Se reiniciara Odoo desea continuar ? "):
+        if Utils.yes_no_option("Se reiniciara Odoo desea continuar ? "):
             # Reinicia odoo con el comando systemctl
             restart_command = "sudo systemctl restart odoo"
             cm.info("Reiniciando Odoo...")
@@ -134,7 +134,7 @@ class OddoCommander :
             command = "echo 'Mostrando log de root:' && sudo tail -f /var/log/odoo/odoo-server.log"
 
             if menu_logs_selected_option == "1":
-                if self.yes_no_option("Se mostrara el log filtrado por root desea continuar ?"):
+                if Utils.yes_no_option("Se mostrara el log filtrado por root desea continuar ?"):
                     try:
                         command += " | grep -i root"
                         self.execute_command_new_terminal(command)
@@ -144,7 +144,7 @@ class OddoCommander :
                         os.system(command)
             
             if menu_logs_selected_option == "2":
-                if self.yes_no_option("Se mostrara el log sin filtrar desea continuar ?"):
+                if Utils.yes_no_option("Se mostrara el log sin filtrar desea continuar ?"):
                     try:
                         self.execute_command_new_terminal(command)
                     except Exception as e:
@@ -154,7 +154,7 @@ class OddoCommander :
 
 
     def change_expiration_date(self):
-        if self.yes_no_option("Desea cambiar la fecha de caducidad de la base de datos ?"):
+        if Utils.yes_no_option("Desea cambiar la fecha de caducidad de la base de datos ?"):
             # Obtener la fecha actual y sumarle 1 mes para actualizar la fecha de caducidad
             expiration_date = datetime.date.today() + datetime.timedelta(days=30)
             # Ejecutar el comando psql para actualizar la fecha de caducidad
@@ -191,7 +191,7 @@ class OddoCommander :
 
 
     def terminal_mode(self):
-        if self.yes_no_option("Se ejecutara Odoo en modo terminal desea continuar ? "):
+        if Utils.yes_no_option("Se ejecutara Odoo en modo terminal desea continuar ? "):
             command = f"echo 'Iniciando odoo en modo terminal:' && sudo -u odoo odoo shell -c /etc/odoo/odoo.conf -d {self.database_name}"
             try:
                 self.execute_command_new_terminal(command)
@@ -201,7 +201,7 @@ class OddoCommander :
                 os.system(command)
                     
     def run_unit_tests(self):
-        if self.yes_no_option("Se ejecutaran pruebas unitarias del modulo seleccionado desea continuar ? "):
+        if Utils.yes_no_option("Se ejecutaran pruebas unitarias del modulo seleccionado desea continuar ? "):
             command = f"echo 'Iniciando pruebas unitarias:' && sudo odoo --test-enable --stop-after-init -d '{self.database_name}' -i '{self.module}' -c /etc/odoo/odoo.conf"
             try:
                 self.execute_command_new_terminal(command)
@@ -223,16 +223,6 @@ class OddoCommander :
         #Funcion que recibe un parametro el nombre de la base de datos para completar el comando y ejecutarlo
         command = f"sudo -u odoo odoo -c /etc/odoo/odoo.conf -d {db_name} -p 8069 --no-http --load-language=es_MX --stop-after-init" 
         os.system(command)
-
-    def yes_no_option (self,message):
-        cm.green()
-        option = input (f"{message} (S/N) \n")
-        option = option.lower()
-        cm.reset()
-        if option == "s":
-            return True
-        else:
-            return False
 
     def execute_command_new_terminal (self,command):
         # Funcion que recibe un parametro el comando a ejecutar y lo ejecuta en una nueva ventana
@@ -321,19 +311,19 @@ class OddoCommander :
             cm.info(f"Valor del chat id: {self.bot_chat_id}")
             bot_token = self.bot_token
             bot_chat_id = self.bot_chat_id
-            if self.yes_no_option("Deseas configurar las notificaciones por Telegram?"):
-                use_telegram_bot = self.yes_no_option("Deseas recibir notificaciones por Telegram?")
+            if Utils.yes_no_option("Deseas configurar las notificaciones por Telegram?"):
+                use_telegram_bot = Utils.yes_no_option("Deseas recibir notificaciones por Telegram?")
                 if use_telegram_bot:
-                    change_token = self.yes_no_option("Deseas cambiar el token del bot?")
+                    change_token = Utils.yes_no_option("Deseas cambiar el token del bot?")
                     if change_token:
                         bot_token = input("Ingresa el token del bot: ")
-                    change_chat_id = self.yes_no_option("Deseas cambiar el chat id?")
+                    change_chat_id = Utils.yes_no_option("Deseas cambiar el chat id?")
                     if change_chat_id:
                         bot_chat_id = input("Ingresa el chat id: ")
                     cm.info(f"Valor de la opcion de notificaciones por Telegram: {use_telegram_bot}")
                     cm.info(f"Valor del token del bot: {bot_token}")
                     cm.info(f"Valor del chat id: {bot_chat_id}")
-                    answer = self.yes_no_option("Deseas guardar los cambios?")
+                    answer = Utils.yes_no_option("Deseas guardar los cambios?")
                     if answer:
                         self.use_telegram_bot = "True"
                         self.bot_token = bot_token
@@ -404,7 +394,7 @@ class OddoCommander :
                 except Exception as e:
                     cm.error(f"Error al enviar notificacion a Telegram: {e}")
                     cm.alert("Configura correctamente el token y el chat id del bot")
-                    if self.yes_no_option("Deseas configurar el token y el chat id del bot?"):
+                    if Utils.yes_no_option("Deseas configurar el token y el chat id del bot?"):
                         self.define_telegram_notifications()
                     else: 
                         self.use_telegram_bot = "False"
@@ -442,7 +432,7 @@ class OddoCommander :
             return self.install_telegram_library('python-telegram-bot')
 
     def install_telegram_library(self,library):
-        if self.yes_no_option(f"Desea instalar la libreria {library} ? "):
+        if Utils.yes_no_option(f"Desea instalar la libreria {library} ? "):
             cm.info(f"Instalando libreria {library}")
             os.system(f"sudo pip install {library}")
             return True
@@ -453,7 +443,7 @@ class OddoCommander :
             return False
             
     def stop_odoo(self):
-        if self.yes_no_option("Se detendra Odoo desea continuar ? "):
+        if Utils.yes_no_option("Se detendra Odoo desea continuar ? "):
             command = "sudo systemctl stop odoo"
             cm.info("Deteniendo servicio de Odoo...")
             os.system(command)
@@ -464,7 +454,7 @@ class OddoCommander :
             sn.send_notify(f"{message} (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
             
     def excute_bandit_test(self):
-        if self.yes_no_option(f"Se ejecutara bandit sobre el modulo {self.module} desea continuar ? "):
+        if Utils.yes_no_option(f"Se ejecutara bandit sobre el modulo {self.module} desea continuar ? "):
             path_to_analyze = f"{self.modules_path}/{self.module}"
             Secutiry.run_bandit(path_to_analyze)
             message = "El proceso de ejecucion de bandit ha finalizado"

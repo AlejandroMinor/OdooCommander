@@ -21,7 +21,6 @@ class SystemNotify:
     @staticmethod
     def send_important_notify(message, title="Alert"):
         try:
-            #command = ['notify-send', '-u', 'critical', title, message]
             command = ['notify-send', '-u', 'critical', '-t', '15000', title, message]
             subprocess.Popen(command)
         except FileNotFoundError:
@@ -79,8 +78,59 @@ class Secutiry:
     def run_bandit(dir):
         try:
             cm.notice("Ejecutando bandit...")
+            Secutiry.verify_bandit_library()
             command = f"bandit -r {dir}"
             os.system(command)
 
         except Exception as e:
             cm.error(f"Error al intentar ejecutar bandit: {e}")
+
+    @staticmethod
+    def verify_bandit_library():
+
+
+        try:
+            result = subprocess.run(['bandit', 'v'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            if result.returncode == 0:
+                return True
+            else:
+                print("Error: Bandit returned a non-zero exit code.")
+                print("Standard Output:")
+                print(result.stdout)
+                print("Standard Error:")
+                print(result.stderr)
+        except PermissionError as e:
+            print(f"Error: Permission denied when running Bandit. {e}")
+            return Secutiry.install_pip_library('bandit')
+        except FileNotFoundError as e:
+            print("Error: Bandit command not found. Make sure it's installed and in your PATH.")
+            return Secutiry.install_pip_library('bandit')
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            return Secutiry.install_pip_library('bandit')
+
+        
+    @staticmethod
+    def install_pip_library(library):
+        
+        if Utils.yes_no_option(f"Desea instalar la libreria {library} ? "):
+            cm.info(f"Instalando libreria {library}")
+            os.system(f"sudo pip install {library}")
+            return True
+        else:
+            cm.alert("No se instalo la libreria")
+            return False
+
+
+class Utils:
+
+    @staticmethod
+    def yes_no_option (message):
+        cm.green()
+        option = input (f"{message} (S/N) \n")
+        option = option.lower()
+        cm.reset()
+        if option == "s":
+            return True
+        else:
+            return False
