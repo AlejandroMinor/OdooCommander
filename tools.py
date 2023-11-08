@@ -71,3 +71,16 @@ class CheckVersion:
 
         except Exception as e:
             cm.error(f"Error al intentar revisar versión: {e}")
+
+
+class Secutiry:
+
+    @staticmethod
+    def run_bandit(dir):
+        try:
+            cm.notice("Ejecutando bandit...")
+            command = f"bandit -r {dir}"
+            os.system(command)
+
+        except Exception as e:
+            cm.error(f"Error al intentar ejecutar bandit: {e}")

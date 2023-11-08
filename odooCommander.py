@@ -3,7 +3,7 @@ import datetime
 import os
 import readline
 import subprocess
-from tools import SystemNotify as sn, TelegramNotify as tn
+from tools import SystemNotify as sn, TelegramNotify as tn, Secutiry
 
 class OddoCommander :
 
@@ -45,7 +45,8 @@ class OddoCommander :
             "7": self.set_parameters,
             "8": self.terminal_mode,
             "9": self.run_unit_tests,
-            "10": self.clear_screen
+            "10": self.clear_screen,
+            "11": self.excute_bandit_test
         }
 
         while True:
@@ -53,7 +54,7 @@ class OddoCommander :
             print("""\
     0. Detener servicio de Odoo
     1. Actualizar la base
-    2. Actualizar módulo(s)
+    2. Actualizar módulo
     3. Actualizar traducciones
     4. Reiniciar Odoo
     5. Mostrar Logs
@@ -62,6 +63,7 @@ class OddoCommander :
     8. Odoo en modo terminal
     9. Ejecutar Pruebas Unitarias
     10. Limpiar Pantalla
+    11. Ejecutar pruebas de seguridad con bandit (al modulo)
     q. Salir
             """)
 
@@ -461,3 +463,13 @@ class OddoCommander :
             cm.ok(message)
             sn.send_notify(f"{message} (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
             
+    def excute_bandit_test(self):
+        if self.yes_no_option(f"Se ejecutara bandit sobre el modulo {self.module} desea continuar ? "):
+            path_to_analyze = f"{self.modules_path}/{self.module}"
+            Secutiry.run_bandit(path_to_analyze)
+            message = "El proceso de ejecucion de bandit ha finalizado"
+            time = datetime.datetime.now()
+            cm.separator()
+            cm.ok(message)
+            sn.send_notify(f"{message} (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
+            cm.separator()
