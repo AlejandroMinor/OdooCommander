@@ -134,7 +134,8 @@ class OddoCommander :
             if menu_logs_selected_option == "1":
                 if self.yes_no_option("Se mostrara el log filtrado por root desea continuar ?"):
                     try:
-                        self.execute_command_new_terminal(f" {command} | grep root")
+                        command += " | grep -i root"
+                        self.execute_command_new_terminal(command)
                     except Exception as e:
                         cm.error(f"Error al mostrar el log en nueva ventana. {e}")
                         cm.alert("Se mostrara el log en la misma ventana")
@@ -143,7 +144,7 @@ class OddoCommander :
             if menu_logs_selected_option == "2":
                 if self.yes_no_option("Se mostrara el log sin filtrar desea continuar ?"):
                     try:
-                        self.execute_command_new_terminal(f" {command} | grep root")
+                        self.execute_command_new_terminal(command)
                     except Exception as e:
                         cm.error(f"Error al mostrar el log en nueva ventana. {e}")
                         cm.alert("Se mostrara el log en la misma ventana")
