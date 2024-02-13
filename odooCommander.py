@@ -59,7 +59,7 @@ class OddoCommander :
     4. Reiniciar Odoo
     5. Mostrar Logs
     6. Cambiar fecha de caducidad a base de datos
-    7. Definir parametros [Base de datos y Modulo(s)]
+    7. Definir parametros [Base de datos y Modulo]
     8. Odoo en modo terminal
     9. Ejecutar Pruebas Unitarias
     10. Limpiar Pantalla
