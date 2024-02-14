@@ -37,8 +37,8 @@ class OdooCommanderActions :
             "q": self.close_program,
             "0": self.stop_odoo,
             "1": lambda: self.update_all_modules(self.database_name),
-            "2": self.update_module,
-            "3": self.update_translations,
+            "2": lambda: self.update_module(self.database_name, self.module),
+            "3": lambda: self.update_translations(self.database_name),
             "4": self.restart_odoo,
             "5": self.show_logs,
             "6": self.change_expiration_date,
@@ -89,17 +89,16 @@ class OdooCommanderActions :
             cm.info("El servicio de Odoo se ha iniciado")
             cm.separator()        
 
-    def update_module(self):
-        if Utils.yes_no_option(f"Se actualizara la base {self.database_name} con {self.module} desea continuar ? "):
-            # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo
-            res = self.update_odoo_modules(self.database_name,self.module)
-            message = f"El proceso de actualizacion del modulo {self.module} ha finalizado"
+    def update_module(self, database_name, module):
+        if Utils.yes_no_option(f"Se actualizara la base {database_name} con {module} desea continuar ? "):
+            res = self.update_odoo_modules(database_name,module)
+            message = f"El proceso de actualizacion del modulo {module} ha finalizado"
             self._result_process(res,message)        
             
-    def update_translations(self):
-        if Utils.yes_no_option(f"Se actualizaran las traducciones {self.database_name} desea continuar ? "):
-            # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo                    
-            self.update_traduction(self.database_name)
+    def update_translations(self, database_name):
+        if Utils.yes_no_option(f"Se actualizaran las traducciones {database_name} desea continuar ? "):                 
+            command = f"sudo -u odoo odoo -c /etc/odoo/odoo.conf -d {database_name} -p 8069 --no-http --load-language=es_MX --stop-after-init" 
+            os.system(command)
             cm.separator()
             cm.info("Reiniciar sistema para que los cambios surtan efecto")
             cm.separator()
@@ -213,15 +212,9 @@ class OdooCommanderActions :
         os.system("clear")
 
     def update_odoo_modules (self,db_name,module):
-        #Funcion que recibe dos parametros el nombre de la base de datos y el modulo a actualizar para completar el comando y ejecutarlo
         command = f"sudo -u odoo odoo -c /etc/odoo/odoo.conf -d {db_name} -u {module} -p 8069 --no-http --load-language=es_MX --stop-after-init"
         res = os.system(command)
         return res
-
-    def update_traduction (self,db_name):
-        #Funcion que recibe un parametro el nombre de la base de datos para completar el comando y ejecutarlo
-        command = f"sudo -u odoo odoo -c /etc/odoo/odoo.conf -d {db_name} -p 8069 --no-http --load-language=es_MX --stop-after-init" 
-        os.system(command)
 
     def execute_command_new_terminal (self,command):
         # Funcion que recibe un parametro el comando a ejecutar y lo ejecuta en una nueva ventana
