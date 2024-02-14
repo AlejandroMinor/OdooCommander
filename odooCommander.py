@@ -5,7 +5,7 @@ import readline
 import subprocess
 from tools import SystemNotify as sn, TelegramNotify as tn, Secutiry, Utils
 
-class OddoCommander :
+class OdooCommanderActions :
 
     def __init__ (self):
 
@@ -33,10 +33,10 @@ class OddoCommander :
         cm.reset()
 
     def menu (self):
-        self.menu_options = {
+        menu_options = {
             "q": self.close_program,
             "0": self.stop_odoo,
-            "1": self.update_all_modules,
+            "1": lambda: self.update_all_modules(self.database_name),
             "2": self.update_module,
             "3": self.update_translations,
             "4": self.restart_odoo,
@@ -68,8 +68,8 @@ class OddoCommander :
             """)
 
             selected_option = input("Acción a realizar: ")
-            if selected_option in self.menu_options:
-                self.menu_options[selected_option]()
+            if selected_option in menu_options:
+                menu_options[selected_option]()
             else:
                 cm.error("Opción no válida. Intente nuevamente.")
                 
@@ -77,14 +77,13 @@ class OddoCommander :
         cm.info("Hasta luego... no olvides revisar las nuevas versiones del programa")
         exit()
 
-    def update_all_modules(self):
-        if Utils.yes_no_option(f"Se detendra el servicio de Odoo y se actualizara toda la base {self.database_name} desea continuar ? "):
+    def update_all_modules(self, database_name):
+        if Utils.yes_no_option(f"Se detendra el servicio de Odoo y se actualizara toda la base {database_name} desea continuar ? "):
             command = "sudo systemctl restart odoo"
             cm.info("Deteniendo Odoo...")
             os.system(command)
-            cm.info(" ✔️  Servicio detenido. Actualizando Modulos...")
-            # Llamar al metodo update_odoo_modules y pasarle como parametro el nombre de la base y el modulo                    
-            res = self.update_odoo_modules(self.database_name,'all')
+            cm.info(" ✔️  Servicio detenido. Actualizando Modulos...")                  
+            res = self.update_odoo_modules(database_name,'all')
             message = "El proceso de actualizacion de todos los modulos ha finalizado"                    
             self._result_process(res,message)
             cm.info("El servicio de Odoo se ha iniciado")
