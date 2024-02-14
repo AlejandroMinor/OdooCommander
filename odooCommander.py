@@ -165,7 +165,7 @@ class OdooCommanderActions :
             '0': self.menu,
             '1': self.define_database_name,
             '2': self.define_module_name,
-            '3': self.define_modules_path,
+            '3': lambda: self.define_modules_path(True),
             '4': self.define_telegram_notifications
         }
 
@@ -180,9 +180,10 @@ class OdooCommanderActions :
     4. Configurar notificaciones de Telegram
     0. Regresar...
                     """)
-
+            
+            
             menu_parameters_selected_option = input("Acción a realizar: \n")
-            if menu_parameters_selected_option in self.menu_options:
+            if menu_parameters_selected_option in parameters_menu:
                 parameters_menu[menu_parameters_selected_option]()
             else:
                 cm.error("Opción no válida. Intente nuevamente.")
@@ -288,11 +289,20 @@ class OdooCommanderActions :
         cm.info(f"Nuevo valor del modulo: {self.module}")
         self.save_parameters()
 
-    def define_modules_path(self):
-        while not os.path.exists(self.modules_path):
+    def define_modules_path(self, redefine=False):
+        def change_path():
             self.modules_path = input("Ingresa la ruta de los modulos de Odoo (Ejemplo /home/minor/Custom_Odoo): ")
             if not os.path.exists(self.modules_path):
                 cm.error("La ruta no existe")
+                
+        if redefine:
+            cm.info(f"Valor actual de la ruta de los modulos: {self.modules_path}")
+            change_path()
+            
+
+        while not os.path.exists(self.modules_path):
+            change_path()
+            
         cm.info(f"Nuevo valor de la ruta de los modulos: {self.modules_path}")
         self.save_parameters()
 
@@ -421,7 +431,7 @@ class OdooCommanderActions :
         except Exception as e:
             cm.error(f"Error al importar la libreria python-telegram-bot: {e}")
             cm.alert("Instala la libreria para poder usar esta funcionalidad")
-            return self.install_telegram_library('python-telegram-bot')
+            return False
 
     def install_telegram_library(self,library):
         if Utils.yes_no_option(f"Desea instalar la libreria {library} ? "):
