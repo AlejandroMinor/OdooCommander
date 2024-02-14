@@ -21,7 +21,7 @@ class SystemNotify:
     @staticmethod
     def send_important_notify(message, title="Alert"):
         try:
-            command = ['notify-send', '-u', 'critical', '-t', '15000', title, message]
+            command = ['notify-send', '-u', 'normal', '-t', '15000', title, message]
             subprocess.Popen(command)
         except FileNotFoundError:
             print("El comando 'notify-send' no está disponible en este sistema.")
