@@ -116,40 +116,52 @@ class OdooCommanderActions :
             sn.send_notify(f"{message} (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
 
     def show_logs(self):
-        menu_logs_selected_option = ''
-        while menu_logs_selected_option !=0 :
+
+        log_command = "echo 'Mostrando log de root:' && sudo tail -f /var/log/odoo/odoo-server.log"
+
+        def greb_log(log_command):
+            if Utils.yes_no_option("Se mostrara el log filtrado por root desea continuar ?"):
+                try:
+                    log_command += " | grep -i root"
+                    self.execute_command_new_terminal(log_command)
+                except Exception as e:
+                    cm.error(f"Error al mostrar el log en nueva ventana. {e}")
+                    cm.alert("Se mostrara el log en la misma ventana")
+                    os.system(log_command)
+
+        def full_log(log_command):
+            if Utils.yes_no_option("Se mostrara el log sin filtrar desea continuar ?"):
+                try:
+                    self.execute_command_new_terminal(log_command)
+                except Exception as e:
+                    cm.error(f"Error al mostrar el log en nueva ventana. {e}")
+                    cm.alert("Se mostrara el log en la misma ventana")
+                    os.system(log_command)
+
+        def return_to_menu():
+            self.menu()
+
+        menu_options = {
+            '1': greb_log,
+            '2': full_log,
+            '0': return_to_menu,
+        }
+
+        while True:
             self.show_title()
-                    
+
             print("""\
     1. Mostrar log filtrado root (Nueva ventana)
     2. Mostrar log sin filtrado (Nueva ventana)
     0. Regresar...
                     """)
+
             menu_logs_selected_option = input("Acción a realizar: \n")
 
-            if menu_logs_selected_option == "0":
-                self.menu()
-            command = "echo 'Mostrando log de root:' && sudo tail -f /var/log/odoo/odoo-server.log"
-
-            if menu_logs_selected_option == "1":
-                if Utils.yes_no_option("Se mostrara el log filtrado por root desea continuar ?"):
-                    try:
-                        command += " | grep -i root"
-                        self.execute_command_new_terminal(command)
-                    except Exception as e:
-                        cm.error(f"Error al mostrar el log en nueva ventana. {e}")
-                        cm.alert("Se mostrara el log en la misma ventana")
-                        os.system(command)
-            
-            if menu_logs_selected_option == "2":
-                if Utils.yes_no_option("Se mostrara el log sin filtrar desea continuar ?"):
-                    try:
-                        self.execute_command_new_terminal(command)
-                    except Exception as e:
-                        cm.error(f"Error al mostrar el log en nueva ventana. {e}")
-                        cm.alert("Se mostrara el log en la misma ventana")
-                        os.system(command)
-
+            if menu_logs_selected_option in menu_options:
+                menu_options[menu_logs_selected_option](log_command)
+            else:
+                cm.error("Opción no válida. Intente nuevamente.")
 
     def change_expiration_date(self):
         if Utils.yes_no_option("Desea cambiar la fecha de caducidad de la base de datos ?"):
