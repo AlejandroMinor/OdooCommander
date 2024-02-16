@@ -72,13 +72,13 @@ class CheckVersion:
             cm.error(f"Error al intentar revisar versión: {e}")
 
 
-class Secutiry:
+class Security:
 
     @staticmethod
     def run_bandit(dir):
         try:
             cm.notice("Ejecutando bandit...")
-            Secutiry.verify_bandit_library()
+            Security.verify_bandit_library()
             command = f"bandit -r {dir}"
             os.system(command)
 
@@ -101,13 +101,13 @@ class Secutiry:
                 print(result.stderr)
         except PermissionError as e:
             print(f"Error: Permission denied when running Bandit. {e}")
-            return Secutiry.install_pip_library('bandit')
+            return Security.install_pip_library('bandit')
         except FileNotFoundError as e:
             print("Error: Bandit command not found. Make sure it's installed and in your PATH.")
-            return Secutiry.install_pip_library('bandit')
+            return Security.install_pip_library('bandit')
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
-            return Secutiry.install_pip_library('bandit')
+            return Security.install_pip_library('bandit')
 
         
     @staticmethod

@@ -3,7 +3,7 @@ import datetime
 import os
 import readline
 import subprocess
-from tools import SystemNotify as sn, TelegramNotify as tn, Secutiry, Utils
+from tools import SystemNotify as sn, TelegramNotify as tn, Security, Utils
 
 MENSAJE_OPCION_INVALIDA = "Opción no válida. Intente nuevamente."
 class OdooCommanderActions :
@@ -471,7 +471,7 @@ class OdooCommanderActions :
     def excute_bandit_test(self):
         if Utils.yes_no_option(f"Se ejecutara bandit sobre el modulo {self.module} desea continuar ? "):
             path_to_analyze = f"{self.modules_path}/{self.module}"
-            Secutiry.run_bandit(path_to_analyze)
+            Security.run_bandit(path_to_analyze)
             message = "El proceso de ejecucion de bandit ha finalizado"
             time = datetime.datetime.now()
             cm.separator()
