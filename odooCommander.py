@@ -5,6 +5,7 @@ import readline
 import subprocess
 from tools import SystemNotify as sn, TelegramNotify as tn, Secutiry, Utils
 
+MENSAJE_OPCION_INVALIDA = "Opción no válida. Intente nuevamente."
 class OdooCommanderActions :
 
     def __init__ (self):
@@ -71,7 +72,7 @@ class OdooCommanderActions :
             if selected_option in menu_options:
                 menu_options[selected_option]()
             else:
-                cm.error("Opción no válida. Intente nuevamente.")
+                cm.error(MENSAJE_OPCION_INVALIDA)
                 
     def close_program(self):
         cm.info("Hasta luego... no olvides revisar las nuevas versiones del programa")
@@ -161,7 +162,7 @@ class OdooCommanderActions :
             if menu_logs_selected_option in menu_options:
                 menu_options[menu_logs_selected_option](log_command)
             else:
-                cm.error("Opción no válida. Intente nuevamente.")
+                cm.error(MENSAJE_OPCION_INVALIDA)
 
     def change_expiration_date(self):
         if Utils.yes_no_option("Desea cambiar la fecha de caducidad de la base de datos ?"):
@@ -198,7 +199,7 @@ class OdooCommanderActions :
             if menu_parameters_selected_option in parameters_menu:
                 parameters_menu[menu_parameters_selected_option]()
             else:
-                cm.error("Opción no válida. Intente nuevamente.")
+                cm.error(MENSAJE_OPCION_INVALIDA)
 
 
     def terminal_mode(self):
