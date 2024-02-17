@@ -1,3 +1,4 @@
-import odooCommander
+from odooCommander import OdooCommanderActions
 
-odooCommander.OddoCommander().menu()
+if __name__ == "__main__":
+    OdooCommanderActions().menu()

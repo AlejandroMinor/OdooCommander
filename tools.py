@@ -1,5 +1,6 @@
 import asyncio
 import subprocess
+import os
 from color_messagges import ColorfulMessages as cm, Color
 
 class SystemNotify:
@@ -20,8 +21,7 @@ class SystemNotify:
     @staticmethod
     def send_important_notify(message, title="Alert"):
         try:
-            #command = ['notify-send', '-u', 'critical', title, message]
-            command = ['notify-send', '-u', 'critical', '-t', '15000', title, message]
+            command = ['notify-send', '-u', 'normal', '-t', '15000', title, message]
             subprocess.Popen(command)
         except FileNotFoundError:
             print("El comando 'notify-send' no está disponible en este sistema.")
@@ -51,3 +51,75 @@ class TelegramNotify:
 # Ejemplo de uso
 #message = "OdooCommander terminó de ejecutar la actualización de los módulos"
 #TelegramNotify.send_telegram_message(bot_token,chat_id,message)
+
+class CheckVersion:
+    @staticmethod
+    def check_for_update():
+        try:
+            cm.info("Verificando actualizaciones...")
+            project_path = os.path.dirname(os.path.realpath(__file__))
+            os.chdir(project_path)
+            subprocess.run(['git', 'fetch'], check=True)
+
+            result = subprocess.run(['git', 'status', '-sb'], capture_output=True, text=True, check=True)
+
+            if "[" in result.stdout:
+                cm.notice("Nueva versión disponible.")
+            
+            else:
+                cm.notice("Odoo Commander está actualizado.")
+
+        except Exception as e:
+            cm.error(f"Error al intentar revisar versión: {e}")
+
+
+class Security:
+
+    @staticmethod
+    def run_bandit(dir):
+        try:
+            import bandit
+            cm.notice("Ejecutando bandit...")
+            Security.verify_bandit_library()
+            bandit
+            command = f"bandit -r {dir}"
+            os.system(command)
+
+        except Exception as e:
+            cm.error(f"Error al intentar ejecutar bandit: {e}. Asegúrate de tener instalado los requerimientos necesarios.")
+
+    @staticmethod
+    def verify_bandit_library():
+        try:
+            result = subprocess.run(['bandit', 'v'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            if result.returncode == 0:
+                return True
+            else:
+                print("Error: Bandit returned a non-zero exit code.")
+                print("Standard Output:")
+                print(result.stdout)
+                print("Standard Error:")
+                print(result.stderr)
+        except PermissionError as e:
+            print(f"Error: Permission denied when running Bandit. {e}")
+            return False
+        except FileNotFoundError as e:
+            print("Error: Bandit command not found. Make sure it's installed and in your PATH.")
+            return False
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            return False
+
+
+class Utils:
+
+    @staticmethod
+    def yes_no_option (message):
+        cm.green()
+        option = input (f"{message} (S/N) \n")
+        option = option.lower()
+        cm.reset()
+        if option == "s":
+            return True
+        else:
+            return False
