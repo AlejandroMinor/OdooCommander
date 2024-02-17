@@ -1,5 +1,6 @@
 from color_messagges import ColorfulMessages as cm, Color
 from tools import SystemNotify as sn, TelegramNotify as tn, Security, Utils, CheckVersion as cv
+from odoo_db_restore import OdooDBRestore as odb
 
 import datetime
 import os
@@ -50,6 +51,7 @@ class OdooCommanderActions :
             "10": self.clear_screen,
             "11": self.excute_bandit_test,
             "12": cv.check_for_update,
+            "13": self.db_restore
         }
 
         while True:
@@ -68,6 +70,7 @@ class OdooCommanderActions :
     10. Limpiar Pantalla
     11. Ejecutar pruebas de seguridad con bandit (al modulo)
     12. Verificar actualizaciones
+    13. Restaurar base de datos manualmente
     q. Salir
             """)
 
@@ -474,3 +477,6 @@ class OdooCommanderActions :
             cm.ok(message)
             sn.send_notify(f"{message} (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
             cm.separator()
+
+    def db_restore(self):
+        odb.OdooDBRestore().sequence_restore()
