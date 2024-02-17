@@ -77,18 +77,18 @@ class Security:
     @staticmethod
     def run_bandit(dir):
         try:
+            import bandit
             cm.notice("Ejecutando bandit...")
             Security.verify_bandit_library()
+            bandit
             command = f"bandit -r {dir}"
             os.system(command)
 
         except Exception as e:
-            cm.error(f"Error al intentar ejecutar bandit: {e}")
+            cm.error(f"Error al intentar ejecutar bandit: {e}. Asegúrate de tener instalado los requerimientos necesarios.")
 
     @staticmethod
     def verify_bandit_library():
-
-
         try:
             result = subprocess.run(['bandit', 'v'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             if result.returncode == 0:
@@ -101,24 +101,12 @@ class Security:
                 print(result.stderr)
         except PermissionError as e:
             print(f"Error: Permission denied when running Bandit. {e}")
-            return Security.install_pip_library('bandit')
+            return False
         except FileNotFoundError as e:
             print("Error: Bandit command not found. Make sure it's installed and in your PATH.")
-            return Security.install_pip_library('bandit')
+            return False
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
-            return Security.install_pip_library('bandit')
-
-        
-    @staticmethod
-    def install_pip_library(library):
-        
-        if Utils.yes_no_option(f"Desea instalar la libreria {library} ? "):
-            cm.info(f"Instalando libreria {library}")
-            os.system(f"sudo pip install {library}")
-            return True
-        else:
-            cm.alert("No se instalo la libreria")
             return False
 
 
