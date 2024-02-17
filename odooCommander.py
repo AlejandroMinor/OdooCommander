@@ -1,11 +1,11 @@
 from color_messagges import ColorfulMessages as cm, Color
 from tools import SystemNotify as sn, TelegramNotify as tn, Security, Utils, CheckVersion as cv
-from odoo_db_restore import OdooDBRestore as odb
 
 import datetime
 import os
 import readline
 import subprocess
+import time
 
 MENSAJE_OPCION_INVALIDA = "Opción no válida. Intente nuevamente."
 class OdooCommanderActions :
@@ -64,7 +64,7 @@ class OdooCommanderActions :
     4. Reiniciar Odoo
     5. Mostrar Logs
     6. Cambiar fecha de caducidad a base de datos
-    7. Definir parametros [Base de datos y Modulo]
+    7. Definir parametros de preferencias
     8. Odoo en modo terminal
     9. Ejecutar Pruebas Unitarias
     10. Limpiar Pantalla
@@ -79,7 +79,8 @@ class OdooCommanderActions :
                 menu_options[selected_option]()
             else:
                 cm.error(MENSAJE_OPCION_INVALIDA)
-                
+            time.sleep(5)    
+
     def close_program(self):
         cm.info("Hasta luego... no olvides revisar las nuevas versiones del programa")
         exit()
@@ -479,4 +480,11 @@ class OdooCommanderActions :
             cm.separator()
 
     def db_restore(self):
-        odb.OdooDBRestore().sequence_restore()
+        try:
+            from odoo_db_restore import OdooDBRestore as odb
+            cm.info("Iniciando proceso de restauración de base de datos...")
+            odb.OdooDBRestore().sequence_restore()
+        except Exception as e:
+            cm.error(f"Error al ejecutar el proceso de restauración de base de datos: {e}")
+            cm.alert("Instala el archivo requirements.txt para poder usar esta funcionalidad (pip install -r requirements.txt)")
+            
