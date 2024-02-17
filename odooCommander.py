@@ -1,9 +1,10 @@
 from color_messagges import ColorfulMessages as cm, Color
+from tools import SystemNotify as sn, TelegramNotify as tn, Security, Utils, CheckVersion as cv
+
 import datetime
 import os
 import readline
 import subprocess
-from tools import SystemNotify as sn, TelegramNotify as tn, Security, Utils
 
 MENSAJE_OPCION_INVALIDA = "Opción no válida. Intente nuevamente."
 class OdooCommanderActions :
@@ -47,7 +48,8 @@ class OdooCommanderActions :
             "8": self.terminal_mode,
             "9": self.run_unit_tests,
             "10": self.clear_screen,
-            "11": self.excute_bandit_test
+            "11": self.excute_bandit_test,
+            "12": cv.check_for_update,
         }
 
         while True:
@@ -65,6 +67,7 @@ class OdooCommanderActions :
     9. Ejecutar Pruebas Unitarias
     10. Limpiar Pantalla
     11. Ejecutar pruebas de seguridad con bandit (al modulo)
+    12. Verificar actualizaciones
     q. Salir
             """)
 

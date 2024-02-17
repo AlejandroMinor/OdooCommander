@@ -56,6 +56,7 @@ class CheckVersion:
     @staticmethod
     def check_for_update():
         try:
+            cm.info("Verificando actualizaciones...")
             project_path = os.path.dirname(os.path.realpath(__file__))
             os.chdir(project_path)
             subprocess.run(['git', 'fetch'], check=True)
