@@ -245,17 +245,10 @@ class OdooCommanderActions :
             return None    
     
     def get_data_bases(self):
-        # Ejecutar el comando psql para obtener el listado de bases de datos
-        #command_psql = "psql -h localhost -U odoo -d postgres -1 -c '\l'" 
         command_psql = "psql -U odoo -l -t | cut -d'|' -f 1 | sed -e 's/ //g' -e '/^$/d'"
         process = subprocess.Popen(command_psql, stdout=subprocess.PIPE, shell=True)
-        # Obtener la salida del comando
-        output, error = process.communicate()
-        
-        # Limpiar lista para evitar que se dupliquen los elementos
+        output = process.communicate()[0]
         self.data_bases_list.clear()
-
-        # Guardar cada linea en una lista y luego imprimirlo
         for line in output.decode("utf-8").splitlines():
             self.data_bases_list.append(f"{line}")
         cm.list_elements(self.data_bases_list)
