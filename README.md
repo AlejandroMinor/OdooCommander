@@ -54,7 +54,8 @@ ___
 9. Ejecutar Odoo en modo pruebas unitarias en el módulo seleccionado.
 10. Limpiar Pantalla: Limpia la pantalla de la terminal.
 11. Pruebas de seguridad: Permite analizar el módulo actual mediante la herramienta Bandit.
-12. Verificar actualizaciones del repositorio. q. Salir: Cierra la herramienta.
+12. Verificar actualizaciones del repositorio. 
+q. Salir: Cierra la herramienta.
   
 ## Configuración
 ___
@@ -79,8 +80,7 @@ Para recibir las notificaciones, se debe crear un bot personalizado en Telegram,
 1. Busca tu bot.
 2. Envía un mensaje al bot (no importa el contenido).
 3. Abre un navegador y ve a la siguiente URL, reemplazando `<TOKEN>` con el token de tu bot: `https://api.telegram.org/bot<TOKEN>/getUpdates`
-4. Busca el campo `"chat":{"id":` en la respuesta JSON. El número después de `"id":` es el ID de chat del grupo.
-
+4. Busca el campo `"chat":{"id":` en la respuesta JSON. El número después de `"id":` es el ID de chat.
 
 **Configuración en la herramienta OdooCommander**
 
