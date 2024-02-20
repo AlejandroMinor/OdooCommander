@@ -24,11 +24,10 @@ class OdooCommanderActions :
         self.get_parameters_from_file(self.config_file_path)
         
     def show_title(self):
-        cm.green("""
-  __         _                
- /  )_/     / )  _  _  _   _/_ _ 
-(__/(/()() (__()//)//)(//)(/(-/  
-""")
+        cm.green("""                                                               
+    ┏┓ ┓      ┏┓             ┓    
+    ┃┃┏┫┏┓┏┓  ┃ ┏┓┏┳┓┏┳┓┏┓┏┓┏┫┏┓┏┓
+    ┗┛┗┻┗┛┗┛  ┗┛┗┛┛┗┗┛┗┗┗┻┛┗┗┻┗ ┛  """)
         cm.reset()
         print("  💻  Base actual " + Color.GREEN +
               f"{self.database_name}" + Color.RESET 
