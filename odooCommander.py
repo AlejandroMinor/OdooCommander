@@ -5,6 +5,7 @@ import datetime
 import os
 import readline
 import subprocess
+import time
 
 MENSAJE_OPCION_INVALIDA = "Opción no válida. Intente nuevamente."
 class OdooCommanderActions :
@@ -23,11 +24,10 @@ class OdooCommanderActions :
         self.get_parameters_from_file(self.config_file_path)
         
     def show_title(self):
-        cm.green("""
-  __         _                
- /  )_/     / )  _  _  _   _/_ _ 
-(__/(/()() (__()//)//)(//)(/(-/  
-""")
+        cm.green("""                                                               
+    ┏┓ ┓      ┏┓             ┓    
+    ┃┃┏┫┏┓┏┓  ┃ ┏┓┏┳┓┏┳┓┏┓┏┓┏┫┏┓┏┓
+    ┗┛┗┻┗┛┗┛  ┗┛┗┛┛┗┗┛┗┗┗┻┛┗┗┻┗ ┛  """)
         cm.reset()
         print("  💻  Base actual " + Color.GREEN +
               f"{self.database_name}" + Color.RESET 
@@ -50,6 +50,7 @@ class OdooCommanderActions :
             "10": self.clear_screen,
             "11": self.excute_bandit_test,
             "12": cv.check_for_update,
+            "13": self.db_restore
         }
 
         while True:
@@ -62,12 +63,13 @@ class OdooCommanderActions :
     4. Reiniciar Odoo
     5. Mostrar Logs
     6. Cambiar fecha de caducidad a base de datos
-    7. Definir parametros [Base de datos y Modulo]
+    7. Definir parametros de preferencias
     8. Odoo en modo terminal
     9. Ejecutar Pruebas Unitarias
     10. Limpiar Pantalla
     11. Ejecutar pruebas de seguridad con bandit (al modulo)
     12. Verificar actualizaciones
+    13. Restaurar base de datos manualmente
     q. Salir
             """)
 
@@ -76,7 +78,8 @@ class OdooCommanderActions :
                 menu_options[selected_option]()
             else:
                 cm.error(MENSAJE_OPCION_INVALIDA)
-                
+            time.sleep(5)    
+
     def close_program(self):
         cm.info("Hasta luego... no olvides revisar las nuevas versiones del programa")
         exit()
@@ -474,3 +477,13 @@ class OdooCommanderActions :
             cm.ok(message)
             sn.send_notify(f"{message} (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
             cm.separator()
+
+    def db_restore(self):
+        try:
+            from odoo_db_restore import OdooDBRestore as odb
+            cm.info("Iniciando proceso de restauración de base de datos...")
+            odb.OdooDBRestore().sequence_restore()
+        except Exception as e:
+            cm.error(f"Error al ejecutar el proceso de restauración de base de datos: {e}")
+            cm.alert("Instala el archivo requirements.txt para poder usar esta funcionalidad (pip install -r requirements.txt)")
+            
