@@ -78,7 +78,7 @@ class OdooCommanderActions :
                 menu_options[selected_option]()
             else:
                 cm.error(MENSAJE_OPCION_INVALIDA)
-            time.sleep(5)    
+            time.sleep(2)    
 
     def close_program(self):
         cm.info("Hasta luego... no olvides revisar las nuevas versiones del programa")
