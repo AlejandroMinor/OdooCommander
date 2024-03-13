@@ -54,8 +54,10 @@ ___
 9. Ejecutar Odoo en modo pruebas unitarias en el módulo seleccionado.
 10. Limpiar Pantalla: Limpia la pantalla de la terminal.
 11. Pruebas de seguridad: Permite analizar el módulo actual mediante la herramienta Bandit.
-12. Verificar actualizaciones del repositorio. 
-q. Salir: Cierra la herramienta.
+12. Verificar actualizaciones del repositorio.
+13. Restaurar bases de datos manualmente: Permite restaurar bases de datos por medio de una interfaz grafica o via terminal permitiendo copiar filestore y dar los permisos necesarios, crear la base de datos y ejecutar el sql para importar los datos. Durante la restauracion pedira contraseñas de usuario y postgres para poder realizar las acciones.  Para más info ver el proyecto
+[OdooDBRestore: Restaura bases de datos de odoo de manera manual (github.com)](https://github.com/AlejandroMinor/OdooDBRestore)
+
   
 ## Configuración
 ___
