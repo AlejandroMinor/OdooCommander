@@ -480,9 +480,29 @@ class OdooCommanderActions :
 
     def db_restore(self):
         try:
-            from odoo_db_restore import OdooDBRestore as odb
+            from odoo_db_restore import db_restore_tools as dbt
             cm.info("Iniciando proceso de restauración de base de datos...")
-            odb.OdooDBRestore().sequence_restore()
+
+            options = {
+                '1': dbt.OdooDBRestore().sequence_restore,
+                '2': dbt.DbRestoreGui().open_gui_interface
+            }
+
+            while True:
+                print("1. Restaurar secuencia de base de datos")
+                print("2. Abrir interfaz gráfica de restauración de base de datos")
+                print("0. Salir")
+                
+                opcion = input("Seleccione una opción: ")
+                
+                if opcion in options:
+                    options[opcion]()
+                elif opcion == "0":
+                    break
+                else:
+                    print("Opción inválida. Por favor, seleccione una opción válida.")
+
+
         except Exception as e:
             cm.error(f"Error al ejecutar el proceso de restauración de base de datos: {e}")
             cm.alert("Instala el archivo requirements.txt para poder usar esta funcionalidad (pip install -r requirements.txt)")
