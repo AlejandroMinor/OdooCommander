@@ -149,8 +149,8 @@ class OdooCommanderActions :
             self.menu()
 
         menu_options = {
-            '1': greb_log,
-            '2': full_log,
+            '1': lambda: greb_log(log_command),
+            '2': lambda: full_log(log_command),
             '0': return_to_menu,
         }
 
@@ -166,7 +166,7 @@ class OdooCommanderActions :
             menu_logs_selected_option = input("Acción a realizar: \n")
 
             if menu_logs_selected_option in menu_options:
-                menu_options[menu_logs_selected_option](log_command)
+                menu_options[menu_logs_selected_option]()
             else:
                 cm.error(MENSAJE_OPCION_INVALIDA)
 
