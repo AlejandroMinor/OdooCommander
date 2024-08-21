@@ -77,8 +77,7 @@ class OdooCommanderActions :
             if selected_option in menu_options:
                 menu_options[selected_option]()
             else:
-                cm.error(MENSAJE_OPCION_INVALIDA)
-            time.sleep(2)    
+                cm.error(MENSAJE_OPCION_INVALIDA)    
 
     def close_program(self):
         cm.info("Hasta luego... no olvides revisar las nuevas versiones del programa")
@@ -425,11 +424,11 @@ class OdooCommanderActions :
         time = datetime.datetime.now()
         cm.separator()
         if result == 0:
-            message = f"{message} correctamente"
+            message = f"✅ {message} correctamente"
             cm.ok(message)
             sn.send_notify(f"{message} (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
         else:
-            message = f"{message} con errores"
+            message = f"❌ {message} con errores"
             cm.error(message)
             sn.send_important_notify(f"{message} (⏳ {time.hour}:{time.minute}:{time.second})", "OdooCommander")
         cm.separator()
