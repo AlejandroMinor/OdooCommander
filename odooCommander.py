@@ -295,6 +295,7 @@ class OdooCommanderActions :
 
     def define_module_name(self):
         module_list = self.get_models_list()
+        module_list.sort()
         cm.list_elements(module_list)
         self.tab_autocomplete(module_list)
         self.module = self.verify_if_exist_in_list(module_list,"Ingresa el nombre del modulo (Puedes usar tab para autocompletar el nombre del modulo) ")
