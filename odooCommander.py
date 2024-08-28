@@ -295,6 +295,7 @@ class OdooCommanderActions :
 
     def define_module_name(self):
         module_list = self.get_models_list()
+        cm.list_elements(module_list)
         self.tab_autocomplete(module_list)
         self.module = self.verify_if_exist_in_list(module_list,"Ingresa el nombre del modulo (Puedes usar tab para autocompletar el nombre del modulo) ")
         cm.info(f"Nuevo valor del modulo: {self.module}")
@@ -361,7 +362,6 @@ class OdooCommanderActions :
         print("\n Esta ruta es donde tienes guardados tus modulos de Odoo customizados")
         self.define_modules_path()
 
-        cm.list_elements(self.get_models_list())
         print("\n Ingresa el nombre del modulo con el que estaras trabajando (Si aun no tienes uno asignado, selecciona cualquiera. Esta configuracion se puede modificar en cualquier momento)")
         
         self.define_module_name()
